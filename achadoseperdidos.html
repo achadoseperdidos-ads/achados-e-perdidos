@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Achados e Perdidos – Perdi um Item</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Georgia, serif;
+        background-color: #e6e6e6;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 48px;
+        margin-top: 30px;
+    }
+
+    p {
+        margin-top: -15px;
+        font-size: 18px;
+    }
+
+    form {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+        gap: 80px;
+    }
+
+    .coluna {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    input, textarea {
+        width: 250px;
+        padding: 10px;
+        border-radius: 12px;
+        border: none;
+        background-color: #9e2f2f;
+        color: white;
+        font-size: 16px;
+    }
+
+    textarea {
+        height: 70px;
+        resize: none;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: white;
+    }
+
+    .botoes {
+        margin-top: 20px;
+    }
+
+    button {
+        padding: 10px 40px;
+        border-radius: 20px;
+        border: none;
+        background-color: #9e2f2f;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #7d2424;
+    }
+
+    /* RESPONSIVO PARA CELULAR */
+    @media (max-width: 600px) {
+        form {
+            flex-direction: column;
+            gap: 20px;
+            margin: 20px;
+        }
+
+        .coluna {
+            width: 100%;
+            gap: 15px;
+        }
+
+        input, textarea {
+            width: 100%;
+        }
+
+        .botoes {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        button {
+            width: 48%;
+            padding: 10px 0;
+            font-size: 18px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<h1>Achados e Perdidos</h1>
+<p>Perdeu algo? Conte pra gente!</p>
+
+<form id="formPerdido">
+
+    <div class="coluna">
+        <input type="text" name="item" placeholder="Nome do item">
+        <input type="text" name="local" placeholder="Local que foi perdido">
+        <textarea name="descricao" placeholder="Descrição do item"></textarea>
+    </div>
+
+    <div class="coluna">
+        <input type="text" name="data" placeholder="Data" required>
+        <input type="text" name="contato" placeholder="Contato">
+
+        <div class="botoes">
+            <button type="button" onclick="history.back()">&#8592; Voltar</button>
+            <button type="submit">Enviar</button>
+        </div>
+    </div>
+
+</form>
+
+<!--  FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
+    authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
+    projectId: "achados-e-perdidos-bae54",
+    storageBucket: "achados-e-perdidos-bae54.firebasestorage.app",
+    messagingSenderId: "744697102397",
+    appId: "1:744697102397:web:badc010a0331aa54af2a54"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const form = document.getElementById("formPerdido");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const item = form.querySelector('[name="item"]').value;
+    const local = form.querySelector('[name="local"]').value;
+    const descricao = form.querySelector('[name="descricao"]').value;
+    const data = form.querySelector('[name="data"]').value;
+    const contato = form.querySelector('[name="contato"]').value;
+
+    try {
+      await addDoc(collection(db, "itens_perdidos"), {
+        item, local, descricao, data, contato
+      });
+
+      alert("Item perdido registrado!");
+      form.reset();
+
+    } catch (erro) {
+      alert("Erro ao enviar!");
+    }
+  });
+</script>
+
+</body>
+</html>

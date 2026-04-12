@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel - Achados e Perdidos</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background-color: #e6e6e6;
+}
+
+/* TOPO */
+.topo {
+    background-color: #9e2f2f;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.usuario {
+    font-size: 14px;
+}
+
+.logout {
+    background: white;
+    color: #9e2f2f;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+/* CONTEÚDO */
+.container {
+    text-align: center;
+    padding: 40px;
+}
+
+h1 {
+    font-size: 40px;
+}
+
+.botoes {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+button.acao {
+    padding: 15px 40px;
+    border-radius: 25px;
+    border: none;
+    background-color: #9e2f2f;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+button.acao:hover {
+    background-color: #7d2424;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔥 TOPO -->
+<div class="topo">
+    <div class="usuario" id="nomeUsuario">Você não está logado</div>
+    <button class="logout" onclick="sair()">Sair</button>
+</div>
+
+<!-- 🔥 CONTEÚDO -->
+<div class="container">
+    <h1>Achados e Perdidos</h1>
+    <p>Bem-vinda ao sistema</p>
+
+    <div class="botoes">
+        <button class="acao" onclick="irEncontrar()">Encontrei um item</button>
+        <button class="acao" onclick="irPerdeu()">Perdi um item</button>
+    </div>
+</div>
+
+<!-- 🔥 FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
+  authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
+  projectId: "achados-e-perdidos-bae54",
+  storageBucket: "achados-e-perdidos-bae54.appspot.com",
+  messagingSenderId: "744697102397",
+  appId: "1:744697102397:web:badc010a0331aa54af2a54"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// 🔥 CONTROLE DE LOGIN (SEM REDIRECIONAR AUTOMÁTICO)
+let usuarioLogado = false;
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    usuarioLogado = true;
+    document.getElementById("nomeUsuario").innerText =
+      "Olá, " + (user.displayName || user.email);
+  } else {
+    usuarioLogado = false;
+    document.getElementById("nomeUsuario").innerText =
+      "Você não está logado";
+  }
+});
+
+// 🔥 BOTÕES COM BLOQUEIO
+window.irEncontrar = function () {
+  if (!usuarioLogado) {
+    alert("Faça login ou cadastre-se!");
+    window.location.href = "cadastro.html";
+  } else {
+    window.location.href = "encontroualgo.html";
+  }
+};
+
+window.irPerdeu = function () {
+  if (!usuarioLogado) {
+    alert("Faça login ou cadastre-se!");
+    window.location.href = "cadastro.html";
+  } else {
+    window.location.href = "achadoseperdidos.html";
+  }
+};
+
+// 🔥 LOGOUT
+window.sair = function () {
+  signOut(auth).then(() => {
+    alert("Você saiu da conta!");
+    location.reload(); // recarrega a tela
+  });
+};
+</script>
+
+</body>
+</html>

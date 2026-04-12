@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login – Achados e Perdidos</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    min-height: 100vh;
+    background: #f9f7f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+
+  .titulo {
+    font-family: 'Bebas Neue';
+    font-size: 2.5rem;
+  }
+
+  .input-group {
+    background:#8b2e2e;
+    border-radius:50px;
+    margin-bottom:15px;
+    padding:10px;
+  }
+
+  .input-group input {
+    width:100%;
+    border:none;
+    background:transparent;
+    color:white;
+    outline:none;
+  }
+
+  button {
+    width:100%;
+    height:45px;
+    border:none;
+    border-radius:50px;
+    margin-top:10px;
+    cursor:pointer;
+  }
+
+  .login-btn {
+    background:#8b2e2e;
+    color:white;
+  }
+
+  .google-btn {
+    background:#4285F4;
+    color:white;
+  }
+
+  .link {
+    margin-top:15px;
+    font-size:14px;
+  }
+</style>
+</head>
+
+<body>
+<div class="card">
+
+  <p class="titulo">Login</p>
+
+  <form id="formLogin">
+    <div class="input-group">
+      <input type="email" name="email" placeholder="Email" required>
+    </div>
+
+    <div class="input-group">
+      <input type="password" name="senha" placeholder="Senha" required>
+    </div>
+
+    <button type="submit" class="login-btn">Entrar</button>
+  </form>
+
+  <button id="googleLogin" class="google-btn">
+    Entrar com Google
+  </button>
+
+  <p class="link">
+    Não tem conta? <a href="cadastro.html">Cadastrar</a>
+  </p>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
+  authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
+  projectId: "achados-e-perdidos-bae54",
+  storageBucket: "achados-e-perdidos-bae54.appspot.com",
+  messagingSenderId: "744697102397",
+  appId: "1:744697102397:web:badc010a0331aa54af2a54"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// 🔥 LOGIN NORMAL
+const form = document.getElementById("formLogin");
+
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  const email = form.email.value;
+  const senha = form.senha.value;
+
+  try{
+    await signInWithEmailAndPassword(auth, email, senha);
+
+    alert("Login realizado com sucesso!");
+    window.location.href = "telainicial.html";
+
+  }catch(err){
+    alert("Erro: " + err.message);
+  }
+});
+
+// 🔥 GOOGLE
+document.getElementById("googleLogin").addEventListener("click", async ()=>{
+  const provider = new GoogleAuthProvider();
+
+  try{
+    await signInWithPopup(auth, provider);
+
+    alert("Login com Google realizado!");
+    window.location.href = "telainicial.html";
+
+  }catch(err){
+    alert("Erro: " + err.message);
+  }
+});
+</script>
+
+</body>
+</html>
