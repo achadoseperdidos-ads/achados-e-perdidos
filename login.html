@@ -1,274 +1,201 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – Achados e Perdidos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
 
-<!-- Responsividade -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* RESET */
+        *{ margin:0; padding:0; box-sizing:border-box; }
 
-<title>Login – Achados e Perdidos</title>
+        body{
+            min-height:100vh;
+            background-color:#FFF5F8;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-family:Georgia, serif;
+            padding:20px;
+        }
 
-<!-- Fontes -->
-<link href="https://fonts.googleapis.com/css2?family=Georgia&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+        .card{
+            background:#FFFFFF;
+            width:100%;
+            max-width:400px;
+            padding:50px 40px;
+            border-radius:24px;
+            border:1px solid #F8BBD0;
+            box-shadow:0 8px 35px rgba(236,111,152,0.15);
+            text-align:center;
+        }
 
-<style>
+        .titulo{
+            font-size:48px;
+            color:#EC6F98;
+            margin-bottom:30px;
+        }
 
-/* RESET */
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+        .input-group{ margin-bottom:18px; }
 
-/* BODY */
-body{
-  min-height:100vh;
-  background-color:#FFF5F8;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-family:Georgia, serif;
-  padding:20px;
-}
+        .input-group input{
+            width:100%;
+            height:52px;
+            border-radius:14px;
+            border:1px solid #F8BBD0;
+            padding:0 15px;
+            font-size:16px;
+            background:#FFFFFF;
+            color:#5A5A5A;
+            outline:none;
+            transition:0.3s;
+        }
 
-/* CARD */
-.card{
-  background:#FFFFFF;
-  width:100%;
-  max-width:400px;
-  padding:50px 40px;
-  border-radius:24px;
-  border:1px solid #F8BBD0;
-  box-shadow:0 8px 35px rgba(236,111,152,0.15);
-  text-align:center;
-}
+        .input-group input:focus{
+            border-color:#EC6F98;
+            box-shadow:0 0 8px rgba(236,111,152,0.2);
+        }
 
-/* TÍTULO */
-.titulo{
-  font-size:48px;
-  color:#EC6F98;
-  margin-bottom:30px;
-}
+        .login-btn{
+            width:100%;
+            height:50px;
+            border:none;
+            border-radius:20px;
+            background:#F48FB1;
+            color:#333;
+            font-size:18px;
+            cursor:pointer;
+            transition:0.3s;
+            margin-top:8px;
+        }
 
-/* INPUT GROUP */
-.input-group{
-  margin-bottom:18px;
-}
+        .login-btn:hover{
+            background:#EC6F98;
+            color:white;
+            transform:scale(1.02);
+        }
 
-/* INPUT */
-.input-group input{
-  width:100%;
-  height:52px;
-  border-radius:14px;
-  border:1px solid #F8BBD0;
-  padding:0 15px;
-  font-size:16px;
-  background:#FFFFFF;
-  color:#5A5A5A;
-  outline:none;
-  transition:0.3s;
-}
+        .google-btn{
+            width:100%;
+            height:50px;
+            border-radius:20px;
+            border:1px solid #F8BBD0;
+            background:#FFFFFF;
+            color:#EC6F98;
+            cursor:pointer;
+            margin-top:12px;
+            font-size:16px;
+            transition:0.3s;
+        }
 
-/* FOCUS */
-.input-group input:focus{
-  border-color:#EC6F98;
-  box-shadow:0 0 8px rgba(236,111,152,0.2);
-}
+        .google-btn:hover{ background:#FCE4EC; }
 
-/* PLACEHOLDER */
-.input-group input::placeholder{
-  color:#B0B0B0;
-}
+        .link{
+            margin-top:18px;
+            font-size:14px;
+            color:#7A7A7A;
+        }
 
-/* BOTÃO LOGIN */
-.login-btn{
-  width:100%;
-  height:50px;
-  border:none;
-  border-radius:20px;
-  background:#F48FB1;
-  color:#333;
-  font-size:18px;
-  cursor:pointer;
-  transition:0.3s;
-  margin-top:8px;
-}
+        .link a{
+            color:#EC6F98;
+            text-decoration:none;
+            font-weight:bold;
+        }
 
-/* HOVER */
-.login-btn:hover{
-  background:#EC6F98;
-  color:white;
-  transform:scale(1.02);
-}
-
-/* BOTÃO GOOGLE */
-.google-btn{
-  width:100%;
-  height:50px;
-  border-radius:20px;
-  border:1px solid #F8BBD0;
-  background:#FFFFFF;
-  color:#EC6F98;
-  cursor:pointer;
-  margin-top:12px;
-  font-size:16px;
-  transition:0.3s;
-}
-
-.google-btn:hover{
-  background:#FCE4EC;
-}
-
-/* LINK */
-.link{
-  margin-top:18px;
-  font-size:14px;
-  color:#7A7A7A;
-}
-
-.link a{
-  color:#EC6F98;
-  text-decoration:none;
-  font-weight:bold;
-}
-
-.link a:hover{
-  text-decoration:underline;
-}
-
-/* RESPONSIVO */
-@media(max-width:600px){
-
-  .card{
-    padding:40px 25px;
-  }
-
-  .titulo{
-    font-size:40px;
-  }
-
-}
-
-</style>
+        @media(max-width:600px){
+            .card{ padding:40px 25px; }
+            .titulo{ font-size:40px; }
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- CARD -->
 <div class="card">
+    <p class="titulo">Login</p>
 
-  <!-- TÍTULO -->
-  <p class="titulo">Login</p>
+    <form id="formLogin">
+        <div class="input-group">
+            <input type="email" name="email" placeholder="Email" required>
+        </div>
+        <div class="input-group">
+            <input type="password" name="senha" placeholder="Senha" required>
+        </div>
+        <button type="submit" class="login-btn">Entrar</button>
+    </form>
 
-  <!-- FORM -->
-  <form id="formLogin">
+    <button id="googleLogin" class="google-btn">Entrar com Google</button>
 
-    <!-- EMAIL -->
-    <div class="input-group">
-      <input type="email" name="email" placeholder="Email" required>
-    </div>
-
-    <!-- SENHA -->
-    <div class="input-group">
-      <input type="password" name="senha" placeholder="Senha" required>
-    </div>
-
-    <!-- BOTÃO -->
-    <button type="submit" class="login-btn">
-      Entrar
-    </button>
-
-  </form>
-
-  <!-- GOOGLE -->
-  <button id="googleLogin" class="google-btn">
-    Entrar com Google
-  </button>
-
-  <!-- LINK -->
-  <p class="link">
-    Não tem conta?
-    <a href="cadastro.html">Cadastrar</a>
-  </p>
-
+    <p class="link">
+        Não tem conta? <a href="cadastro.html">Cadastrar</a>
+    </p>
 </div>
 
-<!-- FIREBASE -->
 <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+        getAuth, 
+        signInWithEmailAndPassword, 
+        GoogleAuthProvider, 
+        signInWithPopup 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* IMPORTS */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    // Sua configuração do Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
+        authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
+        projectId: "achados-e-perdidos-bae54",
+        storageBucket: "achados-e-perdidos-bae54.appspot.com",
+        messagingSenderId: "744697102397",
+        appId: "1:744697102397:web:badc010a0331aa54af2a54"
+    };
 
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-/* CONFIG */
-const firebaseConfig = {
-  apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
-  authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
-  projectId: "achados-e-perdidos-bae54",
-  storageBucket: "achados-e-perdidos-bae54.appspot.com",
-  messagingSenderId: "744697102397",
-  appId: "1:744697102397:web:badc010a0331aa54af2a54"
-};
+    // Lógica de Login com Email
+    const form = document.getElementById("formLogin");
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = form.email.value;
+        const senha = form.senha.value;
 
-/* INIT */
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+        try {
+            await signInWithEmailAndPassword(auth, email, senha);
+            alert("Login realizado com sucesso!");
+            window.location.href = "telainicial.html";
+        } catch(err) {
+            console.error(err);
+            alert("Erro no login: " + err.message);
+        }
+    });
 
-/* FORM */
-const form = document.getElementById("formLogin");
-
-/* LOGIN */
-form.addEventListener("submit", async (e)=>{
-
-  e.preventDefault();
-
-  const email = form.email.value;
-  const senha = form.senha.value;
-
-  try{
-
-    await signInWithEmailAndPassword(auth, email, senha);
-
-    alert("Login realizado com sucesso!");
-
-    window.location.href = "telainicial.html";
-
-  }catch(err){
-
-    alert("Erro: " + err.message);
-
-  }
-
-});
-
-/* GOOGLE */
-document.getElementById("googleLogin")
-.addEventListener("click", async ()=>{
-
-  const provider = new GoogleAuthProvider();
-
-  try{
-
-    await signInWithPopup(auth, provider);
-
-    alert("Login com Google realizado!");
-
-    window.location.href = "telainicial.html";
-
-  }catch(err){
-
-    alert("Erro: " + err.message);
-
-  }
-
-});
-
+    // Lógica de Login com Google
+    const btnGoogle = document.getElementById("googleLogin");
+    btnGoogle.addEventListener("click", async () => {
+        try {
+            // Abre o popup do Google
+            const resultado = await signInWithPopup(auth, provider);
+            
+            // Se chegou aqui, logou!
+            console.log("Usuário logado:", resultado.user);
+            alert("Bem-vindo(a), " + resultado.user.displayName);
+            
+            window.location.href = "telainicial.html";
+        } catch(err) {
+            console.error("Erro detalhado do Google:", err);
+            
+            // Tratamento de erro específico para domínio não autorizado
+            if (err.code === "auth/unauthorized-domain") {
+                alert("Erro: Este domínio não está autorizado no Firebase console.");
+            } else {
+                alert("Erro ao logar com Google: " + err.message);
+            }
+        }
+    });
 </script>
 
 </body>
