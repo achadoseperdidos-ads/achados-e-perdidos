@@ -2,17 +2,12 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Achados e Perdidos – Encontrou Algo</title>
 
 <style>
-
 /* RESET */
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 /* BASE */
 body {
@@ -32,10 +27,7 @@ body {
     align-items: center;
 }
 
-/* usuário */
-.usuario {
-    font-size: 14px;
-}
+.usuario { font-size: 14px; }
 
 /* BOTÃO SAIR */
 .logout {
@@ -56,19 +48,8 @@ body {
     color: white;
 }
 
-/* TÍTULO */
-h1 {
-    font-size: 48px;
-    margin-top: 30px;
-    color: #EC6F98;
-}
-
-/* SUBTÍTULO */
-p {
-    margin-top: -15px;
-    font-size: 18px;
-    color: #7A7A7A;
-}
+h1 { font-size: 48px; margin-top: 30px; color: #EC6F98; }
+p { margin-top: -15px; font-size: 18px; color: #7A7A7A; }
 
 /* FORM */
 form {
@@ -78,14 +59,12 @@ form {
     gap: 80px;
 }
 
-/* colunas */
 .coluna {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-/* inputs */
 input, textarea {
     width: 100%;
     max-width: 250px;
@@ -97,13 +76,8 @@ input, textarea {
     font-size: 16px;
 }
 
-/* textarea */
-textarea {
-    height: 70px;
-    resize: none;
-}
+textarea { height: 70px; resize: none; }
 
-/* botões */
 .botoes {
     margin-top: 20px;
     display: flex;
@@ -112,7 +86,6 @@ textarea {
     justify-content: center;
 }
 
-/* botão padrão */
 button {
     padding: 10px 20px;
     border-radius: 20px;
@@ -132,42 +105,19 @@ button:hover {
 
 /* 📱 RESPONSIVO */
 @media (max-width: 600px) {
-
-    form {
-        flex-direction: column;
-        gap: 15px;
-        margin: 15px;
-        align-items: center;
-    }
-
-    .coluna {
-        width: 100%;
-        align-items: center;
-    }
-
-    input, textarea {
-        max-width: 100%;
-    }
-
-    .botoes {
-        flex-direction: row;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .botoes button {
-        flex: 1;
-        max-width: 150px;
-    }
+    form { flex-direction: column; gap: 15px; margin: 15px; align-items: center; }
+    .coluna { width: 100%; align-items: center; }
+    input, textarea { max-width: 100%; }
+    .botoes { flex-direction: row; justify-content: center; gap: 10px; }
+    .botoes button { flex: 1; max-width: 150px; }
 }
-
 </style>
 </head>
 
 <body>
 
 <div class="topo">
-    <div class="usuario" id="nomeUsuario">Você não está logado</div>
+    <div class="usuario" id="nomeUsuario">Carregando usuário...</div>
     <button class="logout" onclick="sair()">Sair</button>
 </div>
 
@@ -175,24 +125,91 @@ button:hover {
 <p>Encontrou algo? Conte pra gente!</p>
 
 <form id="formEncontrado">
-
     <div class="coluna">
-        <input type="text" name="item" placeholder="Nome do item">
-        <input type="text" name="local" placeholder="Local que foi encontrado">
+        <input type="text" name="item" placeholder="Nome do item" required>
+        <input type="text" name="local" placeholder="Local que foi encontrado" required>
         <textarea name="descricao" placeholder="Descrição do item"></textarea>
     </div>
 
     <div class="coluna">
-        <input type="text" name="data" placeholder="Data" required>
-        <input type="text" name="contato" placeholder="Contato">
+        <input type="text" name="data" placeholder="Data (Ex: 14/05)" required>
+        <input type="text" name="contato" placeholder="Seu contato" required>
 
         <div class="botoes">
             <button type="button" onclick="history.back()">Voltar</button>
             <button type="submit">Enviar</button>
         </div>
     </div>
-
 </form>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
+        authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
+        projectId: "achados-e-perdidos-bae54",
+        storageBucket: "achados-e-perdidos-bae54.firebasestorage.app",
+        messagingSenderId: "744697102397",
+        appId: "1:744697102397:web:badc010a0331aa54af2a54"
+    };
+
+    let db, auth;
+    try {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+        console.log("🔥 Firebase conectado!");
+    } catch (e) {
+        console.error("❌ Erro ao conectar:", e);
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        const userDiv = document.getElementById("nomeUsuario");
+        if (userDiv) {
+            userDiv.innerText = user ? "Olá, " + (user.displayName || user.email) : "Não logado";
+        }
+    });
+
+    window.sair = () => {
+        signOut(auth).then(() => {
+            alert("Até logo!");
+            window.location.reload(); 
+        });
+    };
+
+    const form = document.getElementById("formEncontrado");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        try {
+            const payload = {
+                item: form.querySelector('input[name="item"]').value,
+                local: form.querySelector('input[name="local"]').value,
+                descricao: form.querySelector('textarea[name="descricao"]').value || "",
+                data: form.querySelector('input[name="data"]').value,
+                contato: form.querySelector('input[name="contato"]').value,
+                criadoEm: serverTimestamp()
+            };
+
+            if (!db) throw new Error("Banco de dados offline.");
+
+            // ✅ Salvando na coleção 'itens_encontrados'
+            await addDoc(collection(db, "itens_encontrados"), payload);
+            
+            alert("Item cadastrado com sucesso!\nEntraremos em contato pelos dados informados assim que o objeto for localizado.");
+            
+            form.reset();
+
+        } catch (error) {
+            console.error("❌ Erro ao salvar:", error);
+            alert("Houve um erro ao enviar: " + error.message);
+        }
+    });
+</script>
 
 </body>
 </html>
