@@ -6,107 +6,115 @@
 <title>Achados e Perdidos – Encontrou Algo</title>
 
 <style>
-    body {
-        margin: 0;
-        font-family: Georgia, serif;
-        background-color: #e6e6e6;
-        text-align: center;
-    }
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background-color: #FFF5F8;
+    text-align: center;
+}
 
-    h1 {
-        font-size: 48px;
-        margin-top: 30px;
-    }
+/* TOPO */
+.topo {
+    background-color:#F8BBD0;
+    color: #5A5A5A;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    p {
-        margin-top: -15px;
-        font-size: 18px;
-    }
+.usuario {
+    font-size: 14px;
+}
 
-    form {
-        margin-top: 40px;
-        display: flex;
-        justify-content: center;
-        gap: 80px;
-    }
+.logout {
+    background: white;
+    color: #EC6F98;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
 
-    .coluna {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
+/* TÍTULO */
+h1 {
+    font-size: 48px;
+    margin-top: 30px;
+    color: #EC6F98;
+}
 
-    input, textarea {
-        width: 250px;
-        padding: 10px;
-        border-radius: 12px;
-        border: none;
-        background-color: #9e2f2f;
-        color: white;
-        font-size: 16px;
-    }
+p {
+    margin-top: -15px;
+    font-size: 18px;
+    color: #7A7A7A;
+}
 
-    textarea {
-        height: 70px;
-        resize: none;
-    }
+/* FORM */
+form {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 80px;
+}
 
-    input::placeholder,
-    textarea::placeholder {
-        color: white;
-    }
+.coluna {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
-    .botoes {
-        margin-top: 20px;
-    }
+/* INPUTS */
+input, textarea {
+    width: 250px;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #F8BBD0;
+    background-color: #FFFFFF;
+    color: #5A5A5A;
+    font-size: 16px;
+}
 
-    button {
-        padding: 10px 40px;
-        border-radius: 20px;
-        border: none;
-        background-color: #9e2f2f;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-    }
+textarea {
+    height: 70px;
+    resize: none;
+}
 
-    button:hover {
-        background-color: #7d2424;
-    }
+input::placeholder,
+textarea::placeholder {
+    color: #B0B0B0;
+}
 
-    /* RESPONSIVO PARA CELULAR */
-    @media (max-width: 600px) {
-        form {
-            flex-direction: column;
-            gap: 20px;
-            margin: 20px;
-        }
+/* BOTÕES */
+.botoes {
+    margin-top: 20px;
+}
 
-        .coluna {
-            width: 100%;
-            gap: 15px;
-        }
+button {
+    padding: 10px 40px;
+    border-radius: 20px;
+    border: none;
+    background-color: #F48FB1;
+    color: #333;
+    font-size: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
-        input, textarea {
-            width: 100%;
-        }
-
-        .botoes {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        button {
-            width: 48%;
-            padding: 10px 0;
-            font-size: 18px;
-        }
-    }
+button:hover {
+    background-color: #EC6F98;
+    color: white;
+    transform: scale(1.03);
+}
 </style>
 </head>
+
 <body>
+
+<!-- TOPO -->
+<div class="topo">
+    <div class="usuario" id="nomeUsuario">Você não está logado</div>
+    <button class="logout" onclick="sair()">Sair</button>
+</div>
 
 <h1>Achados e Perdidos</h1>
 <p>Encontrou algo? Conte pra gente!</p>
@@ -120,57 +128,92 @@
     </div>
 
     <div class="coluna">
-      <input type="text" name="data" placeholder="Data" required>
+        <input type="text" name="data" placeholder="Data" required>
         <input type="text" name="contato" placeholder="Contato">
 
         <div class="botoes">
-            <button type="button" onclick="history.back()">&#8592; Voltar</button>
+            <button type="button" onclick="history.back()">← Voltar</button>
             <button type="submit">Enviar</button>
         </div>
     </div>
 
 </form>
 
-<!--  FIREBASE -->
+<!-- FIREBASE -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
-    authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
-    projectId: "achados-e-perdidos-bae54",
-    storageBucket: "achados-e-perdidos-bae54.firebasestorage.app",
-    messagingSenderId: "744697102397",
-    appId: "1:744697102397:web:badc010a0331aa54af2a54"
-  };
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+/* CONFIG IGUAL DA TELA INICIAL */
+const firebaseConfig = {
+  apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
+  authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
+  projectId: "achados-e-perdidos-bae54",
+  storageBucket: "achados-e-perdidos-bae54.appspot.com",
+  messagingSenderId: "744697102397",
+  appId: "1:744697102397:web:badc010a0331aa54af2a54"
+};
 
-  const form = document.getElementById("formEncontrado");
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+/* USUÁRIO */
+let usuarioLogado = false;
 
-    const item = form.querySelector('[name="item"]').value;
-    const local = form.querySelector('[name="local"]').value;
-    const descricao = form.querySelector('[name="descricao"]').value;
-    const data = form.querySelector('[name="data"]').value;
-    const contato = form.querySelector('[name="contato"]').value;
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    usuarioLogado = true;
+    document.getElementById("nomeUsuario").innerText =
+      "Olá, " + (user.displayName || user.email);
+  } else {
+    usuarioLogado = false;
+    document.getElementById("nomeUsuario").innerText =
+      "Você não está logado";
+  }
+});
 
-    try {
-      await addDoc(collection(db, "itens_encontrados"), {
-        item, local, descricao, data, contato
-      });
-
-      alert("Item registrado com sucesso!");
-      form.reset();
-
-    } catch (erro) {
-      alert("Erro ao enviar!");
-    }
+/* SAIR */
+window.sair = function () {
+  signOut(auth).then(() => {
+    alert("Você saiu da conta!");
+    location.reload();
   });
+};
+
+/* FORM */
+const form = document.getElementById("formEncontrado");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!usuarioLogado) {
+    alert("Faça login primeiro!");
+    window.location.href = "cadastro.html";
+    return;
+  }
+
+  const item = form.item.value;
+  const local = form.local.value;
+  const descricao = form.descricao.value;
+  const data = form.data.value;
+  const contato = form.contato.value;
+
+  try {
+    await addDoc(collection(db, "itens_encontrados"), {
+      item, local, descricao, data, contato
+    });
+
+    alert("Item registrado com sucesso!");
+    form.reset();
+
+  } catch (erro) {
+    alert("Erro ao enviar!");
+  }
+});
+
 </script>
 
 </body>

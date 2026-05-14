@@ -2,142 +2,240 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+
+<!-- Responsividade para celular -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Título da página -->
 <title>Cadastro – Achados e Perdidos</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Importação de fontes -->
+<link href="https://fonts.googleapis.com/css2?family=Georgia&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-  body {
-    min-height: 100vh;
-    background: #f9f7f4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Poppins', sans-serif;
+/* RESET */
+*, *::before, *::after {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+/* BODY */
+body {
+  min-height:100vh;
+  background-color:#FFF5F8;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family: Georgia, serif;
+  padding:20px;
+}
+
+/* CARD */
+.card {
+  background:#FFFFFF;
+  border-radius:24px;
+  padding:50px 40px;
+  width:100%;
+  max-width:400px;
+  box-shadow:0 8px 35px rgba(236,111,152,0.15);
+  text-align:center;
+  border:1px solid #F8BBD0;
+}
+
+/* TÍTULO */
+.titulo {
+  font-size:48px;
+  color:#EC6F98;
+  margin-bottom:5px;
+}
+
+/* SUBTÍTULO */
+.subtitulo {
+  font-size:18px;
+  color:#7A7A7A;
+  margin-bottom:30px;
+}
+
+/* INPUT GROUP */
+.input-group {
+  margin-bottom:18px;
+}
+
+/* INPUT */
+.input-group input {
+  width:100%;
+  height:52px;
+  border-radius:14px;
+  border:1px solid #F8BBD0;
+  padding:0 15px;
+  font-size:16px;
+  background:#FFFFFF;
+  color:#5A5A5A;
+  outline:none;
+  transition:0.3s;
+}
+
+/* FOCUS */
+.input-group input:focus {
+  border-color:#EC6F98;
+  box-shadow:0 0 8px rgba(236,111,152,0.2);
+}
+
+/* PLACEHOLDER */
+.input-group input::placeholder {
+  color:#B0B0B0;
+}
+
+/* BOTÃO PRINCIPAL */
+.btn-entrar {
+  margin-top:10px;
+  background:#F48FB1;
+  color:#333;
+  border:none;
+  border-radius:20px;
+  width:100%;
+  height:50px;
+  cursor:pointer;
+  font-size:18px;
+  transition:0.3s;
+}
+
+/* HOVER */
+.btn-entrar:hover {
+  background:#EC6F98;
+  color:white;
+  transform:scale(1.02);
+}
+
+/* BOTÃO GOOGLE */
+.google-btn {
+  margin-top:12px;
+  background:#FFFFFF;
+  border:1px solid #F8BBD0;
+  color:#EC6F98;
+  border-radius:20px;
+  width:100%;
+  height:50px;
+  cursor:pointer;
+  font-size:16px;
+  transition:0.3s;
+}
+
+.google-btn:hover {
+  background:#FCE4EC;
+}
+
+/* ERRO */
+.erro-msg {
+  background:#FCE4EC;
+  color:#EC6F98;
+  border-radius:12px;
+  padding:10px;
+  display:none;
+  margin-bottom:15px;
+  font-size:14px;
+}
+
+/* LOGIN LINK */
+.login-link {
+  margin-top:18px;
+  font-size:14px;
+  color:#7A7A7A;
+}
+
+.login-link a {
+  color:#EC6F98;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.login-link a:hover {
+  text-decoration:underline;
+}
+
+/* RESPONSIVO */
+@media (max-width:600px){
+
+  .card{
+    padding:40px 25px;
   }
 
-  .card {
-    background: #fff;
-    border-radius: 24px;
-    padding: 52px 44px 48px;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.08);
-    text-align: center;
+  .titulo{
+    font-size:38px;
   }
 
-  .titulo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.6rem;
-  }
+}
 
-  .subtitulo {
-    font-family:'Bebas Neue';
-    font-size:0.95rem;
-    letter-spacing:5px;
-    color:#bbb;
-    margin-bottom:22px;
-  }
-
-  .input-group {
-    display:flex;
-    align-items:center;
-    background:#8b2e2e;
-    border-radius:50px;
-    padding:0 20px;
-    margin-bottom:14px;
-    height:52px;
-  }
-
-  .input-group input {
-    flex:1;
-    background:transparent;
-    border:none;
-    outline:none;
-    color:#fff;
-  }
-
-  .btn-entrar {
-    margin-top:8px;
-    background:#8b2e2e;
-    color:#fff;
-    border:none;
-    border-radius:50px;
-    width:100%;
-    height:48px;
-    cursor:pointer;
-  }
-
-  .google-btn {
-    margin-top:10px;
-    background:#4285F4;
-    color:white;
-    border:none;
-    border-radius:50px;
-    width:100%;
-    height:48px;
-    cursor:pointer;
-  }
-
-  .erro-msg {
-    background:#fde8e8;
-    color:#8b2e2e;
-    border-radius:10px;
-    padding:10px;
-    display:none;
-    margin-bottom:10px;
-  }
-
-  .login-link {
-    margin-top:15px;
-    font-size:14px;
-  }
 </style>
 </head>
 
 <body>
+
+<!-- CARD -->
 <div class="card">
 
+  <!-- TÍTULO -->
   <p class="titulo">Achados e Perdidos</p>
+
+  <!-- SUBTÍTULO -->
   <p class="subtitulo">ETEC ASSIS</p>
 
+  <!-- ERRO -->
   <div class="erro-msg" id="erroMsg"></div>
 
+  <!-- FORM -->
   <form id="formCad">
+
+    <!-- NOME -->
     <div class="input-group">
       <input type="text" name="nome" placeholder="Nome" required>
     </div>
 
+    <!-- EMAIL -->
     <div class="input-group">
       <input type="email" name="email" placeholder="Email" required>
     </div>
 
+    <!-- SENHA -->
     <div class="input-group">
       <input type="password" name="senha" placeholder="Senha" required>
     </div>
 
-    <button type="submit" class="btn-entrar">Cadastrar</button>
+    <!-- BOTÃO -->
+    <button type="submit" class="btn-entrar">
+      Cadastrar
+    </button>
+
   </form>
 
-  <!-- 🔥 GOOGLE -->
+  <!-- GOOGLE -->
   <button id="googleLogin" class="google-btn">
     Continuar com Google
   </button>
 
-  <!-- 🔥 LOGIN -->
+  <!-- LOGIN -->
   <p class="login-link">
-    Já tem conta? <a href="login.html">Faça login</a>
+    Já tem conta?
+    <a href="login.html">Faça login</a>
   </p>
 
 </div>
 
+<!-- FIREBASE -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+/* FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
   authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
@@ -147,13 +245,15 @@ const firebaseConfig = {
   appId: "1:744697102397:web:badc010a0331aa54af2a54"
 };
 
+/* INIT */
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// 🔥 CADASTRO
+/* FORM */
 const form = document.getElementById("formCad");
 
 form.addEventListener("submit", async (e)=>{
+
   e.preventDefault();
 
   const nome = form.nome.value;
@@ -161,40 +261,50 @@ form.addEventListener("submit", async (e)=>{
   const senha = form.senha.value;
 
   try {
+
     await createUserWithEmailAndPassword(auth, email, senha);
 
     alert("Conta criada com sucesso! Bem-vinda, " + nome);
 
     setTimeout(()=>{
       window.location.href = "telainicial.html";
-    }, 1000);
+    },1000);
 
   } catch(err){
+
     const el = document.getElementById("erroMsg");
+
     el.style.display = "block";
     el.textContent = err.message;
   }
+
 });
 
-// 🔥 GOOGLE LOGIN
+/* GOOGLE LOGIN */
 const googleBtn = document.getElementById("googleLogin");
 
 googleBtn.addEventListener("click", async ()=>{
+
   const provider = new GoogleAuthProvider();
 
   try{
+
     const result = await signInWithPopup(auth, provider);
 
     alert("Bem-vinda, " + result.user.displayName);
 
     setTimeout(()=>{
       window.location.href = "telainicial.html";
-    }, 1000);
+    },1000);
 
   }catch(err){
+
     alert("Erro no Google: " + err.message);
+
   }
+
 });
+
 </script>
 
 </body>

@@ -2,96 +2,195 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+
+<!-- Responsividade -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Painel - Achados e Perdidos</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background-color: #e6e6e6;
+
+/* RESET */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+/* BODY */
+body{
+    min-height:100vh;
+    font-family:Georgia, serif;
+    background-color:#FFF5F8;
 }
 
 /* TOPO */
-.topo {
-    background-color: #9e2f2f;
-    color: white;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.topo{
+    background-color:#F8BBD0;
+    color:#5A5A5A;
+    padding:15px 25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 10px rgba(236,111,152,0.10);
 }
 
-.usuario {
-    font-size: 14px;
+/* USUÁRIO */
+.usuario{
+    font-size:14px;
 }
 
-.logout {
-    background: white;
-    color: #9e2f2f;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 20px;
-    cursor: pointer;
+/* BOTÃO SAIR */
+.logout{
+    background:#FFFFFF;
+    color:#EC6F98;
+    border:none;
+    padding:10px 18px;
+    border-radius:20px;
+    cursor:pointer;
+    transition:0.3s;
+    font-size:15px;
 }
 
-/* CONTEÚDO */
-.container {
-    text-align: center;
-    padding: 40px;
+.logout:hover{
+    background:#FCE4EC;
+    transform:scale(1.03);
 }
 
-h1 {
-    font-size: 40px;
+/* CONTAINER */
+.container{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:80px 20px;
 }
 
-.botoes {
-    margin-top: 40px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
+/* TÍTULO */
+h1{
+    font-size:55px;
+    color:#EC6F98;
+    margin-bottom:10px;
 }
 
-button.acao {
-    padding: 15px 40px;
-    border-radius: 25px;
-    border: none;
-    background-color: #9e2f2f;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
+/* TEXTO */
+p{
+    color:#7A7A7A;
+    font-size:20px;
 }
 
-button.acao:hover {
-    background-color: #7d2424;
+/* BOTÕES */
+.botoes{
+    margin-top:50px;
+    display:flex;
+    gap:25px;
+    flex-wrap:wrap;
+    justify-content:center;
 }
+
+/* BOTÕES DE AÇÃO */
+button.acao{
+    padding:16px 38px;
+    border:none;
+    border-radius:25px;
+    background-color:#F48FB1;
+    color:#333;
+    font-size:18px;
+    cursor:pointer;
+    transition:0.3s;
+    box-shadow:0 4px 15px rgba(236,111,152,0.15);
+}
+
+/* HOVER */
+button.acao:hover{
+    background-color:#EC6F98;
+    color:white;
+    transform:scale(1.04);
+}
+
+/* RESPONSIVO */
+@media(max-width:600px){
+
+    h1{
+        font-size:42px;
+    }
+
+    p{
+        font-size:18px;
+    }
+
+    .botoes{
+        flex-direction:column;
+        width:100%;
+    }
+
+    button.acao{
+        width:100%;
+        max-width:300px;
+    }
+
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 TOPO -->
+<!-- TOPO -->
 <div class="topo">
-    <div class="usuario" id="nomeUsuario">Você não está logado</div>
-    <button class="logout" onclick="sair()">Sair</button>
-</div>
 
-<!-- 🔥 CONTEÚDO -->
-<div class="container">
-    <h1>Achados e Perdidos</h1>
-    <p>Bem-vinda ao sistema</p>
-
-    <div class="botoes">
-        <button class="acao" onclick="irEncontrar()">Encontrei um item</button>
-        <button class="acao" onclick="irPerdeu()">Perdi um item</button>
+    <!-- USUÁRIO -->
+    <div class="usuario" id="nomeUsuario">
+        Você não está logado
     </div>
+
+    <!-- SAIR -->
+    <button class="logout" onclick="sair()">
+        Sair
+    </button>
+
 </div>
 
-<!-- 🔥 FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+<!-- CONTEÚDO -->
+<div class="container">
 
+    <!-- TÍTULO -->
+    <h1>Achados e Perdidos</h1>
+
+    <!-- TEXTO -->
+    <p>Bem-vindo ao sistema</p>
+
+    <!-- BOTÕES -->
+    <div class="botoes">
+
+        <!-- ENCONTREI -->
+        <button class="acao" onclick="irEncontrar()">
+            Encontrei um item
+        </button>
+
+        <!-- PERDI -->
+        <button class="acao" onclick="irPerdeu()">
+            Perdi um item
+        </button>
+
+    </div>
+
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+
+/* IMPORTS */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+/* CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
   authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
@@ -101,50 +200,79 @@ const firebaseConfig = {
   appId: "1:744697102397:web:badc010a0331aa54af2a54"
 };
 
+/* INIT */
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// 🔥 CONTROLE DE LOGIN (SEM REDIRECIONAR AUTOMÁTICO)
+/* LOGIN */
 let usuarioLogado = false;
 
+/* OBSERVADOR */
 onAuthStateChanged(auth, (user) => {
-  if (user) {
+
+  if(user){
+
     usuarioLogado = true;
+
     document.getElementById("nomeUsuario").innerText =
       "Olá, " + (user.displayName || user.email);
-  } else {
+
+  }else{
+
     usuarioLogado = false;
+
     document.getElementById("nomeUsuario").innerText =
       "Você não está logado";
+
   }
+
 });
 
-// 🔥 BOTÕES COM BLOQUEIO
-window.irEncontrar = function () {
-  if (!usuarioLogado) {
+/* ENCONTREI */
+window.irEncontrar = function(){
+
+  if(!usuarioLogado){
+
     alert("Faça login ou cadastre-se!");
     window.location.href = "cadastro.html";
-  } else {
+
+  }else{
+
     window.location.href = "encontroualgo.html";
+
   }
+
 };
 
-window.irPerdeu = function () {
-  if (!usuarioLogado) {
+/* PERDI */
+window.irPerdeu = function(){
+
+  if(!usuarioLogado){
+
     alert("Faça login ou cadastre-se!");
     window.location.href = "cadastro.html";
-  } else {
+
+  }else{
+
     window.location.href = "achadoseperdidos.html";
+
   }
+
 };
 
-// 🔥 LOGOUT
-window.sair = function () {
-  signOut(auth).then(() => {
+/* SAIR */
+window.sair = function(){
+
+  signOut(auth).then(()=>{
+
     alert("Você saiu da conta!");
-    location.reload(); // recarrega a tela
+
+    location.reload();
+
   });
+
 };
+
 </script>
 
 </body>
