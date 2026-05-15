@@ -63,6 +63,12 @@
             border: 1px solid #F8BBD0;
             background-color: #FFFFFF;
             font-size: 16px;
+            font-family: Georgia, serif;
+        }
+
+        /* AJUSTE PARA O CAMPO DE DATA */
+        input[type="date"] {
+            color: #7A7A7A;
         }
 
         /* ÁREA DOS BOTÕES */
@@ -119,8 +125,9 @@
     </div>
 
     <div class="coluna">
-        <input type="text" name="data" placeholder="Data (Ex: 10/05)" required>
-        <input type="text" name="contato" placeholder="Seu contato (WhatsApp/Email)" required>
+        <input type="date" name="data" required>
+        
+        <input type="text" name="contato" placeholder="Seu contato" required>
 
         <div class="botoes">
             <button type="button" onclick="window.history.back();">Voltar</button>
@@ -134,7 +141,6 @@
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    // ✅ SUAS CHAVES REAIS
     const firebaseConfig = {
         apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
         authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
@@ -174,18 +180,12 @@
         e.preventDefault();
 
         try {
-            const campoItem = form.querySelector('input[name="item"]').value;
-            const campoLocal = form.querySelector('input[name="local"]').value;
-            const campoDescricao = form.querySelector('textarea[name="descricao"]').value || "";
-            const campoData = form.querySelector('input[name="data"]').value;
-            const campoContato = form.querySelector('input[name="contato"]').value;
-
             const payload = {
-                item: campoItem,
-                local: campoLocal,
-                descricao: campoDescricao,
-                data: campoData,
-                contato: campoContato,
+                item: form.querySelector('input[name="item"]').value,
+                local: form.querySelector('input[name="local"]').value,
+                descricao: form.querySelector('textarea[name="descricao"]').value || "",
+                data: form.querySelector('input[name="data"]').value,
+                contato: form.querySelector('input[name="contato"]').value,
                 criadoEm: serverTimestamp()
             };
 
@@ -193,7 +193,6 @@
 
             await addDoc(collection(db, "itens_perdidos"), payload);
             
-            // ✅ MENSAGEM FINAL RESUMIDA E ORGANIZADA
             alert("Item cadastrado com sucesso!\nEntraremos em contato pelos dados informados assim que o objeto for localizado.");
             
             form.reset();

@@ -9,7 +9,6 @@
 /* RESET */
 * { box-sizing: border-box; }
 
-/* BASE */
 body {
     margin: 0;
     font-family: Georgia, serif;
@@ -29,7 +28,6 @@ body {
 
 .usuario { font-size: 14px; }
 
-/* BOTÃO SAIR */
 .logout {
     background: white;
     color: #EC6F98;
@@ -39,13 +37,6 @@ body {
     font-size: 13px;
     cursor: pointer;
     transition: 0.2s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    margin-right: 5px;
-}
-
-.logout:hover {
-    background: #EC6F98;
-    color: white;
 }
 
 h1 { font-size: 48px; margin-top: 30px; color: #EC6F98; }
@@ -74,6 +65,11 @@ input, textarea {
     background-color: #FFFFFF;
     color: #5A5A5A;
     font-size: 16px;
+    font-family: Georgia, serif;
+}
+
+input[type="date"] {
+    color: #7A7A7A;
 }
 
 textarea { height: 70px; resize: none; }
@@ -97,19 +93,8 @@ button {
     transition: 0.3s;
 }
 
-button:hover {
-    background-color: #EC6F98;
-    color: white;
-    transform: scale(1.03);
-}
-
-/* 📱 RESPONSIVO */
 @media (max-width: 600px) {
-    form { flex-direction: column; gap: 15px; margin: 15px; align-items: center; }
-    .coluna { width: 100%; align-items: center; }
-    input, textarea { max-width: 100%; }
-    .botoes { flex-direction: row; justify-content: center; gap: 10px; }
-    .botoes button { flex: 1; max-width: 150px; }
+    form { flex-direction: column; align-items: center; }
 }
 </style>
 </head>
@@ -132,7 +117,8 @@ button:hover {
     </div>
 
     <div class="coluna">
-        <input type="text" name="data" placeholder="Data (Ex: 14/05)" required>
+        <input type="date" name="data" required>
+        
         <input type="text" name="contato" placeholder="Seu contato" required>
 
         <div class="botoes">
@@ -156,35 +142,21 @@ button:hover {
         appId: "1:744697102397:web:badc010a0331aa54af2a54"
     };
 
-    let db, auth;
-    try {
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-        console.log("🔥 Firebase conectado!");
-    } catch (e) {
-        console.error("❌ Erro ao conectar:", e);
-    }
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
     onAuthStateChanged(auth, (user) => {
-        const userDiv = document.getElementById("nomeUsuario");
-        if (userDiv) {
-            userDiv.innerText = user ? "Olá, " + (user.displayName || user.email) : "Não logado";
-        }
+        document.getElementById("nomeUsuario").innerText = user ? "Olá, " + (user.displayName || user.email) : "Não logado";
     });
 
     window.sair = () => {
-        signOut(auth).then(() => {
-            alert("Até logo!");
-            window.location.reload(); 
-        });
+        signOut(auth).then(() => window.location.reload());
     };
 
     const form = document.getElementById("formEncontrado");
-
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-
         try {
             const payload = {
                 item: form.querySelector('input[name="item"]').value,
@@ -194,19 +166,11 @@ button:hover {
                 contato: form.querySelector('input[name="contato"]').value,
                 criadoEm: serverTimestamp()
             };
-
-            if (!db) throw new Error("Banco de dados offline.");
-
-            // ✅ Salvando na coleção 'itens_encontrados'
             await addDoc(collection(db, "itens_encontrados"), payload);
-            
-            alert("Item cadastrado com sucesso!\nEntraremos em contato pelos dados informados assim que o objeto for localizado.");
-            
+            alert("Item cadastrado com sucesso!");
             form.reset();
-
         } catch (error) {
-            console.error("❌ Erro ao salvar:", error);
-            alert("Houve um erro ao enviar: " + error.message);
+            alert("Erro ao enviar: " + error.message);
         }
     });
 </script>
