@@ -38,6 +38,7 @@ body{
     justify-content:space-between;
 
     padding:0 15px;
+    box-sizing:border-box;
 
     z-index:10;
 }
@@ -237,63 +238,62 @@ p{
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* 🔥 FIREBASE CORRIGIDO */
-const firebaseConfig = {
-    apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
-    authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
-    projectId: "achados-e-perdidos-bae54",
-    storageBucket: "achados-e-perdidos-bae54.appspot.com",
-    messagingSenderId: "744697102397",
-    appId: "1:744697102397:web:badc010a0331aa54af2a54"
-};
+    const firebaseConfig = {
+        apiKey: "SUA_API_KEY",
+        authDomain: "SEU_AUTH_DOMAIN",
+        projectId: "SEU_PROJECT_ID",
+        storageBucket: "SEU_BUCKET",
+        messagingSenderId: "SEU_SENDER_ID",
+        appId: "SEU_APP_ID"
+    };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-let usuarioLogado = false;
+    let usuarioLogado = false;
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        usuarioLogado = true;
-        document.getElementById("nomeUsuario").innerText =
-            "Olá, " + (user.displayName || user.email);
-    } else {
-        usuarioLogado = false;
-        document.getElementById("nomeUsuario").innerText =
-            "Você não está logado";
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            usuarioLogado = true;
+            document.getElementById("nomeUsuario").innerText =
+                "Olá, " + (user.displayName || user.email);
+        } else {
+            usuarioLogado = false;
+            document.getElementById("nomeUsuario").innerText =
+                "Você não está logado";
+        }
+    });
+
+    window.irEncontrar = function() {
+        if (!usuarioLogado) {
+            alert("Faça login ou cadastre-se!");
+            window.location.href = "login.html";
+        } else {
+            window.location.href = "encontroualgo.html";
+        }
     }
-});
 
-window.irEncontrar = function() {
-    if (!usuarioLogado) {
-        alert("Faça login ou cadastre-se!");
-        window.location.href = "login.html";
-    } else {
-        window.location.href = "encontroualgo.html";
+    window.irPerdeu = function() {
+        if (!usuarioLogado) {
+            alert("Faça login ou cadastre-se!");
+            window.location.href = "login.html";
+        } else {
+            window.location.href = "achadoseperdidos.html";
+        }
     }
-}
 
-window.irPerdeu = function() {
-    if (!usuarioLogado) {
-        alert("Faça login ou cadastre-se!");
-        window.location.href = "login.html";
-    } else {
-        window.location.href = "achadoseperdidos.html";
+    window.sair = async function() {
+        try {
+            await signOut(auth);
+            alert("Você saiu da conta!");
+            location.reload();
+        } catch (error) {
+            alert("Erro ao sair: " + error.message);
+        }
     }
-}
-
-window.sair = async function() {
-    try {
-        await signOut(auth);
-        alert("Você saiu da conta!");
-        location.reload();
-    } catch (error) {
-        alert("Erro ao sair: " + error.message);
-    }
-}
 </script>
 
 </body>
