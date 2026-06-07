@@ -5,23 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login – Achados e Perdidos</title>
     <link href="https://fonts.googleapis.com/css2?family=Georgia&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { min-height:100vh; background-color:#FFF5F8; display:flex; justify-content:center; align-items:center; font-family:Georgia, serif; padding:20px; }
-        .card { background:#FFFFFF; width:100%; max-width:400px; padding:50px 40px; border-radius:24px; border:1px solid #F8BBD0; box-shadow:0 8px 35px rgba(236,111,152,0.15); text-align:center; }
-        .titulo { font-size:48px; color:#EC6F98; margin-bottom:30px; }
-        .input-group { margin-bottom:18px; }
-        .input-group input { width:100%; height:52px; border-radius:14px; border:1px solid #F8BBD0; padding:0 15px; font-size:16px; background:#FFFFFF; color:#5A5A5A; outline:none; transition:0.3s; }
-        .input-group input:focus { border-color:#EC6F98; box-shadow:0 0 8px rgba(236,111,152,0.2); }
-        .login-btn { width:100%; height:50px; border:none; border-radius:20px; background:#F48FB1; color:#333; font-size:18px; cursor:pointer; transition:0.3s; margin-top:8px; }
-        .login-btn:hover { background:#EC6F98; color:white; transform:scale(1.02); }
-        .google-btn { width:100%; height:50px; border-radius:20px; border:1px solid #F8BBD0; background:#FFFFFF; color:#EC6F98; cursor:pointer; margin-top:12px; font-size:16px; transition:0.3s; }
-        .google-btn:hover { background:#FCE4EC; }
-        .link { margin-top:18px; font-size:14px; color:#7A7A7A; }
-        .link a { color:#EC6F98; text-decoration:none; font-weight:bold; }
-        @media(max-width:600px) { .card { padding:40px 25px; } .titulo { font-size:40px; } }
+        *{ margin:0; padding:0; box-sizing:border-box; }
+        body{ min-height:100vh; background-color:#FFF5F8; display:flex; justify-content:center; align-items:center; font-family:Georgia, serif; padding:20px; }
+        .card{ background:#FFFFFF; width:100%; max-width:400px; padding:50px 40px; border-radius:24px; border:1px solid #F8BBD0; box-shadow:0 8px 35px rgba(236,111,152,0.15); text-align:center; }
+        .titulo{ font-size:48px; color:#EC6F98; margin-bottom:30px; }
+        .input-group{ margin-bottom:18px; }
+        .input-group input{ width:100%; height:52px; border-radius:14px; border:1px solid #F8BBD0; padding:0 15px; font-size:16px; background:#FFFFFF; color:#5A5A5A; outline:none; transition:0.3s; }
+        .input-group input:focus{ border-color:#EC6F98; box-shadow:0 0 8px rgba(236,111,152,0.2); }
+        .login-btn{ width:100%; height:50px; border:none; border-radius:20px; background:#F48FB1; color:#333; font-size:18px; cursor:pointer; transition:0.3s; margin-top:8px; }
+        .login-btn:hover{ background:#EC6F98; color:white; transform:scale(1.02); }
+        .google-btn{ width:100%; height:50px; border-radius:20px; border:1px solid #F8BBD0; background:#FFFFFF; color:#EC6F98; cursor:pointer; margin-top:12px; font-size:16px; transition:0.3s; }
+        .google-btn:hover{ background:#FCE4EC; }
+        .link{ margin-top:18px; font-size:14px; color:#7A7A7A; }
+        .link a{ color:#EC6F98; text-decoration:none; font-weight:bold; }
+        @media(max-width:600px){ .card{ padding:40px 25px; } .titulo{ font-size:40px; } }
     </style>
 </head>
+
 <body>
 <div class="card">
     <p class="titulo">Login</p>
@@ -33,9 +35,17 @@
     <button id="googleLogin" class="google-btn">Entrar com Google</button>
     <p class="link">Não tem conta? <a href="cadastro.html">Cadastrar</a></p>
 </div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import {
+        getAuth,
+        signInWithEmailAndPassword,
+        GoogleAuthProvider,
+        signInWithPopup,
+        signInWithRedirect,
+        getRedirectResult
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
@@ -52,7 +62,6 @@
 
     const isIphone = /iPhone/i.test(navigator.userAgent);
 
-    /* CAPTURA RETORNO DO REDIRECT (só no iPhone) */
     if (isIphone) {
         getRedirectResult(auth).then((result) => {
             if (result && result.user) {
@@ -60,35 +69,42 @@
                 window.location.href = "telainicial.html";
             }
         }).catch((err) => {
-            alert("Erro ao logar com Google: " + err.message);
+            if (err.code === "auth/unauthorized-domain") {
+                alert("Erro: Este domínio não está autorizado no Firebase console.");
+            } else {
+                alert("Erro ao logar com Google: " + err.message);
+            }
         });
     }
 
-    /* LOGIN COM EMAIL */
-    document.getElementById("formLogin").addEventListener("submit", async (e) => {
+    const form = document.getElementById("formLogin");
+    form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const email = e.target.email.value;
-        const senha = e.target.senha.value;
+        const email = form.email.value;
+        const senha = form.senha.value;
         try {
             await signInWithEmailAndPassword(auth, email, senha);
             alert("Login realizado com sucesso!");
             window.location.href = "telainicial.html";
         } catch(err) {
+            console.error(err);
             alert("Erro no login: " + err.message);
         }
     });
 
-    /* LOGIN COM GOOGLE */
-    document.getElementById("googleLogin").addEventListener("click", async () => {
+    const btnGoogle = document.getElementById("googleLogin");
+    btnGoogle.addEventListener("click", async () => {
         try {
             if (isIphone) {
                 await signInWithRedirect(auth, provider);
             } else {
                 const resultado = await signInWithPopup(auth, provider);
+                console.log("Usuário logado:", resultado.user);
                 alert("Bem-vindo(a), " + resultado.user.displayName);
                 window.location.href = "telainicial.html";
             }
         } catch(err) {
+            console.error("Erro detalhado do Google:", err);
             if (err.code === "auth/unauthorized-domain") {
                 alert("Erro: Este domínio não está autorizado no Firebase console.");
             } else {

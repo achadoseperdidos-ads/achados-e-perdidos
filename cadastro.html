@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cadastro – Achados e Perdidos</title>
 <link href="https://fonts.googleapis.com/css2?family=Georgia&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-body { min-height:100vh; background-color:#FFF5F8; display:flex; align-items:center; justify-content:center; font-family:Georgia, serif; padding:20px; }
+body { min-height:100vh; background-color:#FFF5F8; display:flex; align-items:center; justify-content:center; font-family: Georgia, serif; padding:20px; }
 .card { background:#FFFFFF; border-radius:24px; padding:50px 40px; width:100%; max-width:400px; box-shadow:0 8px 35px rgba(236,111,152,0.15); text-align:center; border:1px solid #F8BBD0; }
 .titulo { font-size:48px; color:#EC6F98; margin-bottom:5px; }
 .subtitulo { font-size:18px; color:#7A7A7A; margin-bottom:30px; }
@@ -26,23 +27,34 @@ body { min-height:100vh; background-color:#FFF5F8; display:flex; align-items:cen
 @media (max-width:600px){ .card{ padding:40px 25px; } .titulo{ font-size:38px; } }
 </style>
 </head>
+
 <body>
 <div class="card">
   <p class="titulo">Achados e Perdidos</p>
   <p class="subtitulo">ETEC ASSIS</p>
   <div class="erro-msg" id="erroMsg"></div>
+
   <form id="formCad">
     <div class="input-group"><input type="text" name="nome" placeholder="Nome" required></div>
     <div class="input-group"><input type="email" name="email" placeholder="Email" required></div>
     <div class="input-group"><input type="password" name="senha" placeholder="Senha" required></div>
     <button type="submit" class="btn-entrar">Cadastrar</button>
   </form>
+
   <button id="googleLogin" class="google-btn">Continuar com Google</button>
   <p class="login-link">Já tem conta? <a href="login.html">Faça login</a></p>
 </div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
@@ -58,47 +70,46 @@ const auth = getAuth(app);
 
 const isIphone = /iPhone/i.test(navigator.userAgent);
 
-/* CAPTURA RETORNO DO REDIRECT (só no iPhone) */
 if (isIphone) {
-    getRedirectResult(auth).then((result) => {
-        if (result && result.user) {
-            alert("Bem-vinda, " + result.user.displayName);
-            setTimeout(() => { window.location.href = "telainicial.html"; }, 1000);
-        }
-    }).catch((err) => {
-        alert("Erro no Google: " + err.message);
-    });
+  getRedirectResult(auth).then((result) => {
+    if (result && result.user) {
+      alert("Bem-vinda, " + result.user.displayName);
+      setTimeout(()=>{ window.location.href = "telainicial.html"; }, 1000);
+    }
+  }).catch((err) => {
+    alert("Erro no Google: " + err.message);
+  });
 }
 
-/* FORM CADASTRO */
-document.getElementById("formCad").addEventListener("submit", async (e) => {
+const form = document.getElementById("formCad");
+form.addEventListener("submit", async (e)=>{
   e.preventDefault();
-  const nome = e.target.nome.value;
-  const email = e.target.email.value;
-  const senha = e.target.senha.value;
+  const nome = form.nome.value;
+  const email = form.email.value;
+  const senha = form.senha.value;
   try {
     await createUserWithEmailAndPassword(auth, email, senha);
     alert("Conta criada com sucesso! Bem-vinda, " + nome);
-    setTimeout(() => { window.location.href = "telainicial.html"; }, 1000);
-  } catch(err) {
+    setTimeout(()=>{ window.location.href = "telainicial.html"; },1000);
+  } catch(err){
     const el = document.getElementById("erroMsg");
     el.style.display = "block";
     el.textContent = err.message;
   }
 });
 
-/* GOOGLE LOGIN */
-document.getElementById("googleLogin").addEventListener("click", async () => {
+const googleBtn = document.getElementById("googleLogin");
+googleBtn.addEventListener("click", async ()=>{
   const provider = new GoogleAuthProvider();
-  try {
+  try{
     if (isIphone) {
       await signInWithRedirect(auth, provider);
     } else {
       const result = await signInWithPopup(auth, provider);
       alert("Bem-vinda, " + result.user.displayName);
-      setTimeout(() => { window.location.href = "telainicial.html"; }, 1000);
+      setTimeout(()=>{ window.location.href = "telainicial.html"; },1000);
     }
-  } catch(err) {
+  }catch(err){
     alert("Erro no Google: " + err.message);
   }
 });
