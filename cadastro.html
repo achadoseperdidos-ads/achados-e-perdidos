@@ -42,7 +42,7 @@ body { min-height:100vh; background-color:#FFF5F8; display:flex; align-items:cen
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
@@ -56,6 +56,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+const isIphone = /iPhone/i.test(navigator.userAgent);
+
+/* CAPTURA RETORNO DO REDIRECT (só no iPhone) */
+if (isIphone) {
+    getRedirectResult(auth).then((result) => {
+        if (result && result.user) {
+            alert("Bem-vinda, " + result.user.displayName);
+            setTimeout(() => { window.location.href = "telainicial.html"; }, 1000);
+        }
+    }).catch((err) => {
+        alert("Erro no Google: " + err.message);
+    });
+}
+
+/* FORM CADASTRO */
 document.getElementById("formCad").addEventListener("submit", async (e) => {
   e.preventDefault();
   const nome = e.target.nome.value;
@@ -72,12 +87,17 @@ document.getElementById("formCad").addEventListener("submit", async (e) => {
   }
 });
 
+/* GOOGLE LOGIN */
 document.getElementById("googleLogin").addEventListener("click", async () => {
   const provider = new GoogleAuthProvider();
   try {
-    const result = await signInWithPopup(auth, provider);
-    alert("Bem-vinda, " + result.user.displayName);
-    setTimeout(() => { window.location.href = "telainicial.html"; }, 1000);
+    if (isIphone) {
+      await signInWithRedirect(auth, provider);
+    } else {
+      const result = await signInWithPopup(auth, provider);
+      alert("Bem-vinda, " + result.user.displayName);
+      setTimeout(() => { window.location.href = "telainicial.html"; }, 1000);
+    }
   } catch(err) {
     alert("Erro no Google: " + err.message);
   }

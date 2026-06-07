@@ -35,7 +35,7 @@
 </div>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
@@ -50,6 +50,21 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
+    const isIphone = /iPhone/i.test(navigator.userAgent);
+
+    /* CAPTURA RETORNO DO REDIRECT (só no iPhone) */
+    if (isIphone) {
+        getRedirectResult(auth).then((result) => {
+            if (result && result.user) {
+                alert("Bem-vindo(a), " + result.user.displayName);
+                window.location.href = "telainicial.html";
+            }
+        }).catch((err) => {
+            alert("Erro ao logar com Google: " + err.message);
+        });
+    }
+
+    /* LOGIN COM EMAIL */
     document.getElementById("formLogin").addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = e.target.email.value;
@@ -63,11 +78,16 @@
         }
     });
 
+    /* LOGIN COM GOOGLE */
     document.getElementById("googleLogin").addEventListener("click", async () => {
         try {
-            const resultado = await signInWithPopup(auth, provider);
-            alert("Bem-vindo(a), " + resultado.user.displayName);
-            window.location.href = "telainicial.html";
+            if (isIphone) {
+                await signInWithRedirect(auth, provider);
+            } else {
+                const resultado = await signInWithPopup(auth, provider);
+                alert("Bem-vindo(a), " + resultado.user.displayName);
+                window.location.href = "telainicial.html";
+            }
         } catch(err) {
             if (err.code === "auth/unauthorized-domain") {
                 alert("Erro: Este domínio não está autorizado no Firebase console.");
