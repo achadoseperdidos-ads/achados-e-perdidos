@@ -223,6 +223,9 @@ tbody td {
 .badge-perdido { background: #FCE4EC; color: #EC6F98; }
 .badge-encontrado { background: #E8F5E9; color: #388E3C; }
 .badge-entregue { background: #E3F2FD; color: #1565C0; }
+.badge-cancelado { background: #F3E5F5; color: #6A1B9A; }
+
+.acoes-status { display: flex; gap: 6px; flex-wrap: wrap; }
 
 .btn-entregar {
     background: none;
@@ -237,6 +240,20 @@ tbody td {
     white-space: nowrap;
 }
 .btn-entregar:hover { background: #1565C0; color: white; }
+
+.btn-cancelar {
+    background: none;
+    border: 1.5px solid #6A1B9A;
+    color: #6A1B9A;
+    border-radius: 14px;
+    padding: 3px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: Georgia, serif;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+.btn-cancelar:hover { background: #6A1B9A; color: white; }
 .entregue-label {
     font-size: 12px;
     color: #1565C0;
@@ -334,7 +351,9 @@ tbody td {
     .badge-perdido { background: #FCE4EC !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .badge-encontrado { background: #E8F5E9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .badge-entregue { background: #E3F2FD !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge-cancelado { background: #F3E5F5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .btn-entregar { display: none !important; }
+    .btn-cancelar { display: none !important; }
 
     /* Quebra de página automática */
     table { page-break-inside: auto; }
@@ -514,6 +533,7 @@ function renderizarRelatorio(itens) {
     const totalPerdidos    = itens.filter(i => i.tipo === "perdido").length;
     const totalEncontrados = itens.filter(i => i.tipo === "encontrado").length;
     const totalEntregues   = itens.filter(i => i.status === "entregue").length;
+    const totalCancelados  = itens.filter(i => i.status === "cancelado").length;
 
     const linhas = itens.length === 0
         ? `<tr><td colspan="9" style="text-align:center;padding:30px;color:#B0B0B0;">Nenhum registro encontrado.</td></tr>`
@@ -538,6 +558,7 @@ function renderizarRelatorio(itens) {
                 <option value="todos">Todos os status</option>
                 <option value="aberto">Em aberto</option>
                 <option value="entregue">Entregue ao responsável</option>
+                <option value="cancelado">Cancelado / Inativo</option>
             </select>
             <input type="date" id="filtroData" onchange="filtrar()" title="Filtrar por data do ocorrido">
         </div>
@@ -559,6 +580,10 @@ function renderizarRelatorio(itens) {
             <div class="resumo-card">
                 <div class="numero" style="color:#1565C0" id="cntEntregues">${totalEntregues}</div>
                 <div class="label">Entregues ao responsável</div>
+            </div>
+            <div class="resumo-card">
+                <div class="numero" style="color:#6A1B9A" id="cntCancelados">${totalCancelados}</div>
+                <div class="label">Cancelados / Inativos</div>
             </div>
         </div>
 
@@ -605,9 +630,18 @@ function gerarLinha(item, num) {
 
     const colecao = item.tipo === "perdido" ? "itens_perdidos" : "itens_encontrados";
 
-    const statusCell = item.status === "entregue"
-        ? `<span class="badge badge-entregue">✔ Entregue</span>`
-        : `<button class="btn-entregar" onclick="marcarEntregue('${colecao}','${item.id}',this)">Marcar como entregue</button>`;
+    let statusCell;
+    if (item.status === "entregue") {
+        statusCell = `<span class="badge badge-entregue">✔ Entregue</span>`;
+    } else if (item.status === "cancelado") {
+        statusCell = `<span class="badge badge-cancelado">✖ Cancelado</span>`;
+    } else {
+        statusCell = `
+            <div class="acoes-status">
+                <button class="btn-entregar" onclick="marcarEntregue('${colecao}','${item.id}',this)">Marcar entregue</button>
+                <button class="btn-cancelar" onclick="cancelarItem('${colecao}','${item.id}',this)">Cancelar</button>
+            </div>`;
+    }
 
     return `
         <tr id="linha-${item.id}">
@@ -650,6 +684,7 @@ window.filtrar = function() {
     document.getElementById("cntPerdidos").textContent    = filtrado.filter(i => i.tipo === "perdido").length;
     document.getElementById("cntEncontrados").textContent = filtrado.filter(i => i.tipo === "encontrado").length;
     document.getElementById("cntEntregues").textContent   = filtrado.filter(i => i.status === "entregue").length;
+    document.getElementById("cntCancelados").textContent  = filtrado.filter(i => i.status === "cancelado").length;
 
     // Atualiza linhas
     const corpo = document.getElementById("corpoTabela");
@@ -690,7 +725,40 @@ window.marcarEntregue = async function(colecao, id, btn) {
     } catch (err) {
         alert("Erro ao atualizar: " + err.message);
         btn.disabled = false;
-        btn.textContent = "Marcar como entregue";
+        btn.textContent = "Marcar entregue";
+    }
+};
+
+// ── CANCELAR / INATIVAR ITEM ──────────────────────────────────
+window.cancelarItem = async function(colecao, id, btn) {
+    if (!confirm("Cancelar / inativar este registro? Ele continuará visível no relatório marcado como cancelado.")) return;
+
+    btn.disabled = true;
+    btn.textContent = "Salvando...";
+
+    try {
+        const _db        = window._db;
+        const _doc       = window._firestoreDoc;
+        const _updateDoc = window._updateDoc;
+
+        await _updateDoc(_doc(_db, colecao, id), { status: "cancelado" });
+
+        const item = todosItens.find(i => i.id === id);
+        if (item) item.status = "cancelado";
+
+        // Substitui toda a div de ações pelo badge
+        const acoesDiv = btn.closest(".acoes-status");
+        if (acoesDiv) {
+            acoesDiv.outerHTML = `<span class="badge badge-cancelado">✖ Cancelado</span>`;
+        }
+
+        const cntEl = document.getElementById("cntCancelados");
+        if (cntEl) cntEl.textContent = todosItens.filter(i => i.status === "cancelado").length;
+
+    } catch (err) {
+        alert("Erro ao cancelar: " + err.message);
+        btn.disabled = false;
+        btn.textContent = "Cancelar";
     }
 };
 
