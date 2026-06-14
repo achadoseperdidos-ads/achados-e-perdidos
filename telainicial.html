@@ -160,6 +160,60 @@ p{
     margin:0;
 }
 
+/* SEPARADOR */
+.separador {
+    width: 260px;
+    max-width: 90%;
+    height: 1px;
+    background: #F8BBD0;
+    margin: 5px auto;
+}
+
+/* CARD ADMIN */
+.card-admin {
+    width:260px;
+    max-width:90%;
+    margin:0 auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    border: 2px solid #EC6F98;
+    box-shadow:0 2px 10px rgba(236,111,152,0.2);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.card-admin:hover{
+    transform:translateY(-3px);
+    background: #FFF0F5;
+    box-shadow:0 6px 18px rgba(236,111,152,0.3);
+}
+
+.card-admin h3{
+    color:#EC6F98;
+}
+
+.card-admin p{
+    font-size:14px;
+    color:#666;
+    margin:0;
+}
+
+.badge-admin {
+    display: inline-block;
+    background: #FCE4EC;
+    color: #EC6F98;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 4px;
+    align-self: flex-start;
+}
+
 </style>
 </head>
 
@@ -200,16 +254,24 @@ p{
             <p>Registrar objeto perdido</p>
         </div>
 
+        <!-- Separador visual -->
+        <div class="separador"></div>
+
+        <!-- Card Administrativo -->
+        <div class="card-admin" onclick="irRelatorio()">
+            <span class="badge-admin">Secretaria</span>
+            <h3>Relatório Administrativo</h3>
+            <p>Visualizar e imprimir todos os registros</p>
+        </div>
+
     </div>
 
 </div>
 
 <script type="module">
-    // 1. IMPORTS DO FIREBASE
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    // 2. CONFIGURAÇÃO (A mesma que você usou no login)
     const firebaseConfig = {
         apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
         authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
@@ -219,13 +281,11 @@ p{
         appId: "1:744697102397:web:badc010a0331aa54af2a54"
     };
 
-    // 3. INICIALIZAÇÃO
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
     let usuarioLogado = false;
 
-    // 4. VERIFICAÇÃO DE ESTADO (O código que você perguntou)
     onAuthStateChanged(auth, (user) => {
         if (user) {
             usuarioLogado = true;
@@ -236,11 +296,10 @@ p{
         }
     });
 
-    // 5. FUNÇÕES DOS BOTÕES (Agora elas usam a variável usuarioLogado atualizada pelo Firebase)
     window.irEncontrar = function() {
         if (!usuarioLogado) {
             alert("Faça login ou cadastre-se!");
-            window.location.href = "login.html"; // Ajuste para o nome real do seu arquivo de login
+            window.location.href = "login.html";
         } else {
             window.location.href = "encontroualgo.html";
         }
@@ -252,6 +311,15 @@ p{
             window.location.href = "login.html";
         } else {
             window.location.href = "achadoseperdidos.html";
+        }
+    }
+
+    window.irRelatorio = function() {
+        if (!usuarioLogado) {
+            alert("Faça login para acessar o relatório!");
+            window.location.href = "login.html";
+        } else {
+            window.location.href = "relatorio.html";
         }
     }
 

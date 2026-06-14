@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório Administrativo – Achados e Perdidos</title>
+
+<style>
+
+/* RESET */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: Georgia, serif;
+    background-color: #FFF5F8;
+    min-height: 100vh;
+}
+
+/* TOPO */
+.topo {
+    background-color: #F8BBD0;
+    color: #5A5A5A;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(236,111,152,0.2);
+}
+
+.logo { font-weight: bold; color: #EC6F98; font-size: 16px; }
+
+.usuario-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.usuario { font-size: 14px; color: #5A5A5A; }
+
+.logout {
+    background: white;
+    color: #EC6F98;
+    border: 1.5px solid #EC6F98;
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.logout:hover { background: #EC6F98; color: white; }
+
+/* CONTEÚDO */
+.container {
+    padding: 90px 30px 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.cabecalho-relatorio {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.cabecalho-relatorio h1 {
+    font-size: 36px;
+    color: #EC6F98;
+    margin-bottom: 5px;
+}
+
+.cabecalho-relatorio p {
+    font-size: 16px;
+    color: #7A7A7A;
+}
+
+/* FILTROS */
+.filtros {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+    align-items: center;
+}
+
+.filtros input, .filtros select {
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid #F8BBD0;
+    background: white;
+    font-size: 14px;
+    font-family: Georgia, serif;
+    color: #5A5A5A;
+    outline: none;
+    transition: 0.2s;
+}
+
+.filtros input:focus, .filtros select:focus {
+    border-color: #EC6F98;
+    box-shadow: 0 0 6px rgba(236,111,152,0.2);
+}
+
+.filtros input { flex: 1; min-width: 180px; }
+
+/* BOTÕES DE AÇÃO */
+.acoes {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 10px 22px;
+    border-radius: 20px;
+    border: none;
+    font-size: 15px;
+    font-family: Georgia, serif;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-imprimir {
+    background: #EC6F98;
+    color: white;
+}
+
+.btn-imprimir:hover { background: #d45a82; transform: scale(1.03); }
+
+.btn-atualizar {
+    background: white;
+    color: #EC6F98;
+    border: 1.5px solid #EC6F98;
+}
+
+.btn-atualizar:hover { background: #FCE4EC; }
+
+/* CONTADORES */
+.resumo {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.resumo-card {
+    background: white;
+    border-radius: 14px;
+    padding: 15px 22px;
+    box-shadow: 0 2px 10px rgba(236,111,152,0.12);
+    border: 1px solid #F8BBD0;
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+}
+
+.resumo-card .numero {
+    font-size: 32px;
+    color: #EC6F98;
+    font-weight: bold;
+}
+
+.resumo-card .label {
+    font-size: 13px;
+    color: #7A7A7A;
+    margin-top: 4px;
+}
+
+/* TABELA */
+.tabela-wrapper {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(236,111,152,0.12);
+    border: 1px solid #F8BBD0;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+thead {
+    background: #F8BBD0;
+}
+
+thead th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 13px;
+    color: #5A5A5A;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+}
+
+tbody tr {
+    border-bottom: 1px solid #FFF0F5;
+    transition: 0.15s;
+}
+
+tbody tr:hover { background: #FFF5F8; }
+
+tbody tr:last-child { border-bottom: none; }
+
+tbody td {
+    padding: 13px 16px;
+    color: #444;
+    vertical-align: top;
+}
+
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.badge-perdido { background: #FCE4EC; color: #EC6F98; }
+.badge-encontrado { background: #E8F5E9; color: #388E3C; }
+
+/* ESTADO VAZIO / CARREGANDO */
+.estado {
+    text-align: center;
+    padding: 50px 20px;
+    color: #B0B0B0;
+    font-size: 16px;
+}
+
+.spinner {
+    width: 36px;
+    height: 36px;
+    border: 4px solid #F8BBD0;
+    border-top-color: #EC6F98;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* LOGIN REQUERIDO */
+.login-required {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.login-required h2 { color: #EC6F98; margin-bottom: 10px; }
+.login-required p { color: #7A7A7A; margin-bottom: 20px; }
+
+.btn-login {
+    background: #F48FB1;
+    color: #333;
+    border: none;
+    border-radius: 20px;
+    padding: 12px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    font-family: Georgia, serif;
+    transition: 0.3s;
+}
+
+.btn-login:hover { background: #EC6F98; color: white; }
+
+/* RODAPÉ DO RELATÓRIO */
+.rodape-relatorio {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 13px;
+    color: #B0B0B0;
+}
+
+/* ============================================================
+   ESTILOS DE IMPRESSÃO / PDF
+   Tudo abaixo só é aplicado quando o usuário imprime
+   ============================================================ */
+@media print {
+
+    /* Oculta elementos de interface */
+    .topo, .filtros, .acoes, .rodape-relatorio { display: none !important; }
+
+    body { background: white; font-family: Arial, sans-serif; }
+
+    .container { padding: 0; max-width: 100%; }
+
+    /* Cabeçalho do PDF */
+    .cabecalho-relatorio { margin-bottom: 20px; }
+    .cabecalho-relatorio h1 { font-size: 22px; color: #EC6F98; }
+    .cabecalho-relatorio p { font-size: 13px; }
+
+    /* Resumo */
+    .resumo { display: flex; gap: 10px; margin-bottom: 15px; }
+    .resumo-card { border: 1px solid #ccc; padding: 10px 15px; border-radius: 8px; }
+    .resumo-card .numero { font-size: 22px; }
+
+    /* Tabela */
+    .tabela-wrapper { box-shadow: none; border: 1px solid #ddd; border-radius: 0; }
+
+    table { font-size: 12px; }
+    thead { background: #F8BBD0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    thead th { padding: 10px 12px; }
+    tbody td { padding: 9px 12px; }
+
+    tbody tr:nth-child(even) {
+        background: #FFF5F8 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .badge-perdido { background: #FCE4EC !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge-encontrado { background: #E8F5E9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    /* Quebra de página automática */
+    table { page-break-inside: auto; }
+    tr { page-break-inside: avoid; }
+}
+
+@media (max-width: 600px) {
+    .filtros { flex-direction: column; }
+    .filtros input { width: 100%; }
+    thead th:nth-child(5), tbody td:nth-child(5) { display: none; } /* esconde coluna descrição no mobile */
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- TOPO -->
+<div class="topo">
+    <div class="logo">Achados &amp; Perdidos</div>
+    <div class="usuario-area">
+        <div class="usuario" id="nomeUsuario">Carregando...</div>
+        <button class="logout" onclick="sair()">Sair</button>
+    </div>
+</div>
+
+<!-- CONTEÚDO -->
+<div class="container">
+
+    <!-- Cabeçalho do relatório (aparece no PDF também) -->
+    <div class="cabecalho-relatorio">
+        <h1>Relatório Administrativo</h1>
+        <p>Sistema de Achados e Perdidos – ETEC Assis</p>
+        <p id="dataRelatorio" style="margin-top:5px; font-size:13px; color:#B0B0B0;"></p>
+    </div>
+
+    <!-- Conteúdo que muda conforme estado do usuário -->
+    <div id="conteudo">
+        <div class="estado"><div class="spinner"></div>Verificando autenticação...</div>
+    </div>
+
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyA7_IQGEBh6Zr3apBR4ujviyOyqcfAJPaw",
+    authDomain: "achados-e-perdidos-bae54.firebaseapp.com",
+    projectId: "achados-e-perdidos-bae54",
+    storageBucket: "achados-e-perdidos-bae54.firebasestorage.app",
+    messagingSenderId: "744697102397",
+    appId: "1:744697102397:web:badc010a0331aa54af2a54"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// ── EMAILS COM ACESSO ADMIN ───────────────────────────────────
+// Para o TCC: adicione aqui os emails que podem ver o relatório.
+// Em produção real, isso ficaria no Firebase (Firestore ou Custom Claims).
+const EMAILS_ADMIN = [
+    "secretaria@etecassis.edu.br",
+    "diretoria@etecassis.edu.br",
+    "admin@etecassis.edu.br"
+];
+
+// Variáveis globais para filtro
+let todosItens = [];
+
+// Data atual no cabeçalho
+const agora = new Date();
+document.getElementById("dataRelatorio").textContent =
+    "Gerado em " + agora.toLocaleDateString("pt-br", { day:"2-digit", month:"long", year:"numeric" }) +
+    " às " + agora.toLocaleTimeString("pt-br", { hour:"2-digit", minute:"2-digit" });
+
+// ── AUTENTICAÇÃO ──────────────────────────────────────────────
+onAuthStateChanged(auth, (user) => {
+    const div = document.getElementById("nomeUsuario");
+    if (!user) {
+        div.textContent = "Não logado";
+        mostrarTelaLogin();
+        return;
+    }
+
+    div.textContent = "Olá, " + (user.displayName || user.email);
+
+    const emailUsuario = (user.email || "").toLowerCase();
+    const ehAdmin = EMAILS_ADMIN.includes(emailUsuario);
+
+    if (ehAdmin) {
+        mostrarRelatorio();
+    } else {
+        mostrarAcessoNegado(user.email);
+    }
+});
+
+window.sair = () => {
+    signOut(auth).then(() => window.location.href = "login.html");
+};
+
+// ── TELA DE LOGIN REQUERIDO ───────────────────────────────────
+function mostrarTelaLogin() {
+    document.getElementById("conteudo").innerHTML = `
+        <div class="login-required">
+            <h2>Acesso Restrito</h2>
+            <p>Faça login para acessar o relatório administrativo.</p>
+            <button class="btn-login" onclick="window.location.href='login.html'">Fazer Login</button>
+        </div>`;
+}
+
+// ── TELA DE ACESSO NEGADO ─────────────────────────────────────
+function mostrarAcessoNegado(email) {
+    document.getElementById("conteudo").innerHTML = `
+        <div class="login-required">
+            <div style="font-size:48px; margin-bottom:16px;">🔒</div>
+            <h2>Acesso Negado</h2>
+            <p>O email <strong>${escHtml(email)}</strong> não tem permissão para acessar o relatório.</p>
+            <p style="margin-top:8px; font-size:13px; color:#B0B0B0;">
+                Somente contas administrativas autorizadas podem visualizar este relatório.
+            </p>
+            <button class="btn-login" style="margin-top:20px" onclick="window.location.href='telainicial.html'">
+                Voltar ao início
+            </button>
+        </div>`;
+}
+
+// ── CARREGAR RELATÓRIO ────────────────────────────────────────
+async function mostrarRelatorio() {
+    document.getElementById("conteudo").innerHTML = `<div class="estado"><div class="spinner"></div>Carregando dados...</div>`;
+
+    try {
+        // Busca itens perdidos e encontrados em paralelo
+        const [snapPerdidos, snapEncontrados] = await Promise.all([
+            getDocs(query(collection(db, "itens_perdidos"), orderBy("criadoEm", "desc"))),
+            getDocs(query(collection(db, "itens_encontrados"), orderBy("criadoEm", "desc")))
+        ]);
+
+        todosItens = [];
+
+        snapPerdidos.forEach(doc => {
+            todosItens.push({ id: doc.id, tipo: "perdido", ...doc.data() });
+        });
+
+        snapEncontrados.forEach(doc => {
+            todosItens.push({ id: doc.id, tipo: "encontrado", ...doc.data() });
+        });
+
+        // Ordenar por data de criação (mais recente primeiro)
+        todosItens.sort((a, b) => {
+            const ta = a.criadoEm?.seconds || 0;
+            const tb = b.criadoEm?.seconds || 0;
+            return tb - ta;
+        });
+
+        renderizarRelatorio(todosItens);
+
+    } catch (err) {
+        document.getElementById("conteudo").innerHTML = `
+            <div class="estado">❌ Erro ao carregar dados: ${err.message}</div>`;
+        console.error(err);
+    }
+}
+
+// ── RENDERIZAR HTML DO RELATÓRIO ──────────────────────────────
+function renderizarRelatorio(itens) {
+    const totalPerdidos   = itens.filter(i => i.tipo === "perdido").length;
+    const totalEncontrados = itens.filter(i => i.tipo === "encontrado").length;
+
+    const linhas = itens.length === 0
+        ? `<tr><td colspan="7" style="text-align:center;padding:30px;color:#B0B0B0;">Nenhum registro encontrado.</td></tr>`
+        : itens.map((item, idx) => {
+            const data = item.data
+                ? new Date(item.data + "T00:00:00").toLocaleDateString("pt-br")
+                : "—";
+
+            const criadoEm = item.criadoEm?.seconds
+                ? new Date(item.criadoEm.seconds * 1000).toLocaleDateString("pt-br")
+                : "—";
+
+            const badge = item.tipo === "perdido"
+                ? `<span class="badge badge-perdido">Perdido</span>`
+                : `<span class="badge badge-encontrado">Encontrado</span>`;
+
+            return `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>${badge}</td>
+                    <td>${escHtml(item.item || "—")}</td>
+                    <td>${escHtml(item.local || "—")}</td>
+                    <td>${escHtml(item.descricao || "—")}</td>
+                    <td>${data}</td>
+                    <td>${escHtml(item.contato || "—")}</td>
+                    <td>${criadoEm}</td>
+                </tr>`;
+        }).join("");
+
+    document.getElementById("conteudo").innerHTML = `
+        <!-- AÇÕES -->
+        <div class="acoes">
+            <button class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+            <button class="btn btn-atualizar" onclick="recarregar()">🔄 Atualizar</button>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filtros">
+            <input type="text" id="filtroTexto" placeholder="🔍 Buscar por item, local ou contato..." oninput="filtrar()">
+            <select id="filtroTipo" onchange="filtrar()">
+                <option value="todos">Todos os registros</option>
+                <option value="perdido">Somente perdidos</option>
+                <option value="encontrado">Somente encontrados</option>
+            </select>
+            <input type="date" id="filtroData" onchange="filtrar()" title="Filtrar por data do ocorrido">
+        </div>
+
+        <!-- RESUMO -->
+        <div class="resumo">
+            <div class="resumo-card">
+                <div class="numero" id="cntTotal">${itens.length}</div>
+                <div class="label">Total de registros</div>
+            </div>
+            <div class="resumo-card">
+                <div class="numero" style="color:#EC6F98" id="cntPerdidos">${totalPerdidos}</div>
+                <div class="label">Itens perdidos</div>
+            </div>
+            <div class="resumo-card">
+                <div class="numero" style="color:#388E3C" id="cntEncontrados">${totalEncontrados}</div>
+                <div class="label">Itens encontrados</div>
+            </div>
+        </div>
+
+        <!-- TABELA -->
+        <div class="tabela-wrapper">
+            <table id="tabelaRelatorio">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Tipo</th>
+                        <th>Item</th>
+                        <th>Local</th>
+                        <th>Descrição</th>
+                        <th>Data</th>
+                        <th>Contato</th>
+                        <th>Registrado em</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabela">
+                    ${linhas}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="rodape-relatorio">
+            Relatório gerado pelo Sistema de Achados e Perdidos – ETEC Assis
+        </div>`;
+}
+
+// ── FILTRO ────────────────────────────────────────────────────
+window.filtrar = function() {
+    const texto = document.getElementById("filtroTexto").value.toLowerCase();
+    const tipo  = document.getElementById("filtroTipo").value;
+    const data  = document.getElementById("filtroData").value;
+
+    const filtrado = todosItens.filter(item => {
+        const matchTexto = !texto ||
+            (item.item    || "").toLowerCase().includes(texto) ||
+            (item.local   || "").toLowerCase().includes(texto) ||
+            (item.contato || "").toLowerCase().includes(texto) ||
+            (item.descricao || "").toLowerCase().includes(texto);
+
+        const matchTipo = tipo === "todos" || item.tipo === tipo;
+        const matchData = !data || item.data === data;
+
+        return matchTexto && matchTipo && matchData;
+    });
+
+    // Atualiza contadores
+    document.getElementById("cntTotal").textContent = filtrado.length;
+    document.getElementById("cntPerdidos").textContent   = filtrado.filter(i => i.tipo === "perdido").length;
+    document.getElementById("cntEncontrados").textContent = filtrado.filter(i => i.tipo === "encontrado").length;
+
+    // Atualiza linhas
+    const corpo = document.getElementById("corpoTabela");
+    if (filtrado.length === 0) {
+        corpo.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#B0B0B0;">Nenhum resultado para os filtros selecionados.</td></tr>`;
+        return;
+    }
+
+    corpo.innerHTML = filtrado.map((item, idx) => {
+        const data = item.data ? new Date(item.data + "T00:00:00").toLocaleDateString("pt-br") : "—";
+        const criadoEm = item.criadoEm?.seconds ? new Date(item.criadoEm.seconds * 1000).toLocaleDateString("pt-br") : "—";
+        const badge = item.tipo === "perdido"
+            ? `<span class="badge badge-perdido">Perdido</span>`
+            : `<span class="badge badge-encontrado">Encontrado</span>`;
+
+        return `<tr>
+            <td>${idx + 1}</td>
+            <td>${badge}</td>
+            <td>${escHtml(item.item || "—")}</td>
+            <td>${escHtml(item.local || "—")}</td>
+            <td>${escHtml(item.descricao || "—")}</td>
+            <td>${data}</td>
+            <td>${escHtml(item.contato || "—")}</td>
+            <td>${criadoEm}</td>
+        </tr>`;
+    }).join("");
+};
+
+// ── RECARREGAR ────────────────────────────────────────────────
+window.recarregar = () => mostrarRelatorio();
+
+// ── UTILIDADE ─────────────────────────────────────────────────
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+</script>
+</body>
+</html>
