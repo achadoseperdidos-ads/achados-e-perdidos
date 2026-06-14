@@ -398,6 +398,11 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Expõe db e doc para uso em funções window.* dentro de módulo ES
+window._db = db;
+window._firestoreDoc = doc;
+window._updateDoc = updateDoc;
+
 // ── EMAILS COM ACESSO ADMIN ───────────────────────────────────
 // Para o TCC: adicione aqui os emails que podem ver o relatório.
 // Em produção real, isso ficaria no Firebase (Firestore ou Custom Claims).
@@ -664,7 +669,11 @@ window.marcarEntregue = async function(colecao, id, btn) {
     btn.textContent = "Salvando...";
 
     try {
-        await updateDoc(doc(db, colecao, id), { status: "entregue" });
+        const _db          = window._db;
+        const _doc         = window._firestoreDoc;
+        const _updateDoc   = window._updateDoc;
+
+        await _updateDoc(_doc(_db, colecao, id), { status: "entregue" });
 
         // Atualiza o array local
         const item = todosItens.find(i => i.id === id);
