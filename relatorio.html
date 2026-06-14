@@ -222,6 +222,26 @@ tbody td {
 
 .badge-perdido { background: #FCE4EC; color: #EC6F98; }
 .badge-encontrado { background: #E8F5E9; color: #388E3C; }
+.badge-entregue { background: #E3F2FD; color: #1565C0; }
+
+.btn-entregar {
+    background: none;
+    border: 1.5px solid #1565C0;
+    color: #1565C0;
+    border-radius: 14px;
+    padding: 3px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: Georgia, serif;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+.btn-entregar:hover { background: #1565C0; color: white; }
+.entregue-label {
+    font-size: 12px;
+    color: #1565C0;
+    font-style: italic;
+}
 
 /* ESTADO VAZIO / CARREGANDO */
 .estado {
@@ -313,6 +333,8 @@ tbody td {
 
     .badge-perdido { background: #FCE4EC !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .badge-encontrado { background: #E8F5E9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge-entregue { background: #E3F2FD !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .btn-entregar { display: none !important; }
 
     /* Quebra de página automática */
     table { page-break-inside: auto; }
@@ -360,7 +382,7 @@ tbody td {
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, orderBy, query, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -484,36 +506,13 @@ async function mostrarRelatorio() {
 
 // ── RENDERIZAR HTML DO RELATÓRIO ──────────────────────────────
 function renderizarRelatorio(itens) {
-    const totalPerdidos   = itens.filter(i => i.tipo === "perdido").length;
+    const totalPerdidos    = itens.filter(i => i.tipo === "perdido").length;
     const totalEncontrados = itens.filter(i => i.tipo === "encontrado").length;
+    const totalEntregues   = itens.filter(i => i.status === "entregue").length;
 
     const linhas = itens.length === 0
-        ? `<tr><td colspan="7" style="text-align:center;padding:30px;color:#B0B0B0;">Nenhum registro encontrado.</td></tr>`
-        : itens.map((item, idx) => {
-            const data = item.data
-                ? new Date(item.data + "T00:00:00").toLocaleDateString("pt-br")
-                : "—";
-
-            const criadoEm = item.criadoEm?.seconds
-                ? new Date(item.criadoEm.seconds * 1000).toLocaleDateString("pt-br")
-                : "—";
-
-            const badge = item.tipo === "perdido"
-                ? `<span class="badge badge-perdido">Perdido</span>`
-                : `<span class="badge badge-encontrado">Encontrado</span>`;
-
-            return `
-                <tr>
-                    <td>${idx + 1}</td>
-                    <td>${badge}</td>
-                    <td>${escHtml(item.item || "—")}</td>
-                    <td>${escHtml(item.local || "—")}</td>
-                    <td>${escHtml(item.descricao || "—")}</td>
-                    <td>${data}</td>
-                    <td>${escHtml(item.contato || "—")}</td>
-                    <td>${criadoEm}</td>
-                </tr>`;
-        }).join("");
+        ? `<tr><td colspan="9" style="text-align:center;padding:30px;color:#B0B0B0;">Nenhum registro encontrado.</td></tr>`
+        : itens.map((item, idx) => gerarLinha(item, idx + 1)).join("");
 
     document.getElementById("conteudo").innerHTML = `
         <!-- AÇÕES -->
@@ -529,6 +528,11 @@ function renderizarRelatorio(itens) {
                 <option value="todos">Todos os registros</option>
                 <option value="perdido">Somente perdidos</option>
                 <option value="encontrado">Somente encontrados</option>
+            </select>
+            <select id="filtroStatus" onchange="filtrar()">
+                <option value="todos">Todos os status</option>
+                <option value="aberto">Em aberto</option>
+                <option value="entregue">Entregue ao responsável</option>
             </select>
             <input type="date" id="filtroData" onchange="filtrar()" title="Filtrar por data do ocorrido">
         </div>
@@ -547,6 +551,10 @@ function renderizarRelatorio(itens) {
                 <div class="numero" style="color:#388E3C" id="cntEncontrados">${totalEncontrados}</div>
                 <div class="label">Itens encontrados</div>
             </div>
+            <div class="resumo-card">
+                <div class="numero" style="color:#1565C0" id="cntEntregues">${totalEntregues}</div>
+                <div class="label">Entregues ao responsável</div>
+            </div>
         </div>
 
         <!-- TABELA -->
@@ -562,6 +570,7 @@ function renderizarRelatorio(itens) {
                         <th>Data</th>
                         <th>Contato</th>
                         <th>Registrado em</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="corpoTabela">
@@ -575,55 +584,105 @@ function renderizarRelatorio(itens) {
         </div>`;
 }
 
-// ── FILTRO ────────────────────────────────────────────────────
-window.filtrar = function() {
-    const texto = document.getElementById("filtroTexto").value.toLowerCase();
-    const tipo  = document.getElementById("filtroTipo").value;
-    const data  = document.getElementById("filtroData").value;
+// ── GERAR LINHA DA TABELA ─────────────────────────────────────
+function gerarLinha(item, num) {
+    const dataOcorrido = item.data
+        ? new Date(item.data + "T00:00:00").toLocaleDateString("pt-br")
+        : "—";
 
-    const filtrado = todosItens.filter(item => {
-        const matchTexto = !texto ||
-            (item.item    || "").toLowerCase().includes(texto) ||
-            (item.local   || "").toLowerCase().includes(texto) ||
-            (item.contato || "").toLowerCase().includes(texto) ||
-            (item.descricao || "").toLowerCase().includes(texto);
+    const criadoEm = item.criadoEm?.seconds
+        ? new Date(item.criadoEm.seconds * 1000).toLocaleDateString("pt-br")
+        : "—";
 
-        const matchTipo = tipo === "todos" || item.tipo === tipo;
-        const matchData = !data || item.data === data;
+    const badge = item.tipo === "perdido"
+        ? `<span class="badge badge-perdido">Perdido</span>`
+        : `<span class="badge badge-encontrado">Encontrado</span>`;
 
-        return matchTexto && matchTipo && matchData;
-    });
+    const colecao = item.tipo === "perdido" ? "itens_perdidos" : "itens_encontrados";
 
-    // Atualiza contadores
-    document.getElementById("cntTotal").textContent = filtrado.length;
-    document.getElementById("cntPerdidos").textContent   = filtrado.filter(i => i.tipo === "perdido").length;
-    document.getElementById("cntEncontrados").textContent = filtrado.filter(i => i.tipo === "encontrado").length;
+    const statusCell = item.status === "entregue"
+        ? `<span class="badge badge-entregue">✔ Entregue</span>`
+        : `<button class="btn-entregar" onclick="marcarEntregue('${colecao}','${item.id}',this)">Marcar como entregue</button>`;
 
-    // Atualiza linhas
-    const corpo = document.getElementById("corpoTabela");
-    if (filtrado.length === 0) {
-        corpo.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#B0B0B0;">Nenhum resultado para os filtros selecionados.</td></tr>`;
-        return;
-    }
-
-    corpo.innerHTML = filtrado.map((item, idx) => {
-        const data = item.data ? new Date(item.data + "T00:00:00").toLocaleDateString("pt-br") : "—";
-        const criadoEm = item.criadoEm?.seconds ? new Date(item.criadoEm.seconds * 1000).toLocaleDateString("pt-br") : "—";
-        const badge = item.tipo === "perdido"
-            ? `<span class="badge badge-perdido">Perdido</span>`
-            : `<span class="badge badge-encontrado">Encontrado</span>`;
-
-        return `<tr>
-            <td>${idx + 1}</td>
+    return `
+        <tr id="linha-${item.id}">
+            <td>${num}</td>
             <td>${badge}</td>
             <td>${escHtml(item.item || "—")}</td>
             <td>${escHtml(item.local || "—")}</td>
             <td>${escHtml(item.descricao || "—")}</td>
-            <td>${data}</td>
+            <td>${dataOcorrido}</td>
             <td>${escHtml(item.contato || "—")}</td>
             <td>${criadoEm}</td>
+            <td>${statusCell}</td>
         </tr>`;
-    }).join("");
+}
+
+// ── FILTRO ────────────────────────────────────────────────────
+window.filtrar = function() {
+    const texto  = document.getElementById("filtroTexto").value.toLowerCase();
+    const tipo   = document.getElementById("filtroTipo").value;
+    const status = document.getElementById("filtroStatus").value;
+    const data   = document.getElementById("filtroData").value;
+
+    const filtrado = todosItens.filter(item => {
+        const matchTexto = !texto ||
+            (item.item      || "").toLowerCase().includes(texto) ||
+            (item.local     || "").toLowerCase().includes(texto) ||
+            (item.contato   || "").toLowerCase().includes(texto) ||
+            (item.descricao || "").toLowerCase().includes(texto);
+
+        const matchTipo   = tipo   === "todos" || item.tipo === tipo;
+        const matchData   = !data  || item.data === data;
+        const itemStatus  = item.status || "aberto";
+        const matchStatus = status === "todos" || itemStatus === status;
+
+        return matchTexto && matchTipo && matchData && matchStatus;
+    });
+
+    // Atualiza contadores
+    document.getElementById("cntTotal").textContent       = filtrado.length;
+    document.getElementById("cntPerdidos").textContent    = filtrado.filter(i => i.tipo === "perdido").length;
+    document.getElementById("cntEncontrados").textContent = filtrado.filter(i => i.tipo === "encontrado").length;
+    document.getElementById("cntEntregues").textContent   = filtrado.filter(i => i.status === "entregue").length;
+
+    // Atualiza linhas
+    const corpo = document.getElementById("corpoTabela");
+    if (filtrado.length === 0) {
+        corpo.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:30px;color:#B0B0B0;">Nenhum resultado para os filtros selecionados.</td></tr>`;
+        return;
+    }
+
+    corpo.innerHTML = filtrado.map((item, idx) => gerarLinha(item, idx + 1)).join("");
+};
+
+// ── MARCAR COMO ENTREGUE ──────────────────────────────────────
+window.marcarEntregue = async function(colecao, id, btn) {
+    if (!confirm("Confirmar que este item foi entregue ao responsável?")) return;
+
+    btn.disabled = true;
+    btn.textContent = "Salvando...";
+
+    try {
+        await updateDoc(doc(db, colecao, id), { status: "entregue" });
+
+        // Atualiza o array local
+        const item = todosItens.find(i => i.id === id);
+        if (item) item.status = "entregue";
+
+        // Substitui o botão pelo badge na linha
+        btn.outerHTML = `<span class="badge badge-entregue">✔ Entregue</span>`;
+
+        // Atualiza o contador
+        const totalEntregues = todosItens.filter(i => i.status === "entregue").length;
+        const cntEl = document.getElementById("cntEntregues");
+        if (cntEl) cntEl.textContent = totalEntregues;
+
+    } catch (err) {
+        alert("Erro ao atualizar: " + err.message);
+        btn.disabled = false;
+        btn.textContent = "Marcar como entregue";
+    }
 };
 
 // ── RECARREGAR ────────────────────────────────────────────────

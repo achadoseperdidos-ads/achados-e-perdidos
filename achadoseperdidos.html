@@ -186,7 +186,8 @@
                 descricao: form.querySelector('textarea[name="descricao"]').value || "",
                 data: form.querySelector('input[name="data"]').value,
                 contato: form.querySelector('input[name="contato"]').value,
-                criadoEm: serverTimestamp()
+                status: "aberto",
+                        criadoEm: serverTimestamp()
             };
 
             if (!db) throw new Error("Banco de dados offline.");
